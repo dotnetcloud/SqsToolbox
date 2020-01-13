@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <Description>.NET Core extensions to support DI registration.</Description>
+      <Copyright>Copyright (c) 2020, Steve Gordon</Copyright>
+      <TargetFramework>netstandard2.0</TargetFramework>
+      <Version>1.0.0-preview.1</Version>
+      <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      <FileVersion>1.0.0.0</FileVersion>
+      <InformationalVersion>1.0.0 Preview 1</InformationalVersion>
+      <PackageVersion>1.0.0-preview.1</PackageVersion>
+      <PackageId>DotNetCloud.SqsToolbox.Extensions</PackageId>
+      <PackageTags>sqs;aws;toolbox;tools;extensions;netcore</PackageTags>
+      <PackageProjectUrl>https://github.com/dotnetcloud/SqsToolbox</PackageProjectUrl>
+      <PackageLicenseUrl>https://github.com/dotnetcloud/SqsToolbox/blob/master/LICENSE</PackageLicenseUrl>
+      <RepositoryType>git</RepositoryType>
+      <RepositoryUrl>git://github.com/dotnetcloud/SqsToolbox</RepositoryUrl>
+      <Authors>Steve Gordon</Authors>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.0" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
+    </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetCloud.SqsToolbox\DotNetCloud.SqsToolbox.csproj" />
+  </ItemGroup>
+
+</Project>

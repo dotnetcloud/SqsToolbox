@@ -29,8 +29,8 @@ namespace DotNetCloud.SqsToolbox
 
         public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs)
         {
-            _queueReaderOptions = queueReaderOptions;
-            _amazonSqs = amazonSqs;
+            _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
+            _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
 
             _channel = Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
             {
