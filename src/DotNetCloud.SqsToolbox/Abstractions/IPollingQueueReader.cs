@@ -1,4 +1,6 @@
-﻿using System.Threading.Channels;
+﻿using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace DotNetCloud.SqsToolbox.Abstractions
 {
@@ -15,11 +17,12 @@ namespace DotNetCloud.SqsToolbox.Abstractions
         /// <summary>
         /// Start polling the queue for messages.
         /// </summary>
-        void Start();
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the polling of the queue.</param>
+        void Start(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Stop polling the queue for messages.
         /// </summary>
-        void Stop();
+        Task StopAsync();
     }
 }
