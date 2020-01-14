@@ -12,12 +12,13 @@ using DotNetCloud.SqsToolbox.Abstractions;
 
 namespace DotNetCloud.SqsToolbox
 {
-    public class SqsSqsPollingQueueReader : ISqsPollingQueueReader, IDisposable
+    public class SqsPollingQueueReader : ISqsPollingQueueReader, IDisposable
     {
         public const string DiagnosticListenerName = "DotNetCloud.SqsToolbox.SqsSqsPollingQueueReader";
 
         private readonly SqsPollingQueueReaderOptions _queueReaderOptions;
         private readonly IAmazonSQS _amazonSqs;
+        private readonly ISqsPollingDelayer _pollingDelayer;
         private readonly Channel<Message> _channel;
         private readonly ReceiveMessageRequest _receiveMessageRequest;
 
@@ -25,15 +26,14 @@ namespace DotNetCloud.SqsToolbox
         private Task _pollingTask;
         private bool _disposed;
         private bool _isStarted;
-
-        private int _emptyResponseCounter;
-
+        
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsSqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
+            _pollingDelayer = pollingDelayer;
 
             _channel = Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
             {
@@ -154,37 +154,13 @@ namespace DotNetCloud.SqsToolbox
 
                     await PublishMessagesAsync(response.Messages);
 
-                    await DelayNextRequestIfRequired(response.Messages);
+                    await _pollingDelayer.Delay(response.Messages, _cancellationTokenSource.Token);
                 }
             }
             finally
             {
                 writer.TryComplete();
             }
-        }
-
-        private Task DelayNextRequestIfRequired(IEnumerable<Message> messages)
-        {
-            if (!messages.Any())
-            {
-                _emptyResponseCounter = 0;
-
-                return Task.CompletedTask;
-            }
-            
-            if (_emptyResponseCounter < 5)
-            {
-                _emptyResponseCounter++;
-            }
-
-            var delaySeconds = _queueReaderOptions.InitialDelayWhenEmpty.Seconds;
-
-            if (_queueReaderOptions.UseExponentialBackoff)
-            {
-                delaySeconds *= (2 ^ _emptyResponseCounter);
-            }
-
-            return Task.Delay(TimeSpan.FromSeconds(delaySeconds));
         }
 
         private async Task PublishMessagesAsync(IReadOnlyList<Message> messages)

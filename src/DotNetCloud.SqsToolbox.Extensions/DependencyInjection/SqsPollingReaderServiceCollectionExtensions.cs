@@ -1,6 +1,7 @@
 ﻿using System;
 using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
@@ -20,9 +21,10 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(queueUrl));
             }
 
-            services.AddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
+            services.TryAddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
 
-            services.AddSingleton<ISqsPollingQueueReader, SqsSqsPollingQueueReader>();
+            services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
+            services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
 
             return services;
         }
@@ -42,9 +44,10 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             services.Configure(configure);
 
-            services.AddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
 
-            services.AddSingleton<ISqsPollingQueueReader, SqsSqsPollingQueueReader>();
+            services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
+            services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
 
             return services;
         }
