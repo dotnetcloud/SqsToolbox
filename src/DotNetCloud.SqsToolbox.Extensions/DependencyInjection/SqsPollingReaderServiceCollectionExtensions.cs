@@ -1,6 +1,7 @@
 ﻿using System;
 using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
@@ -19,10 +20,10 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(queueUrl));
             }
 
-            services.AddSingleton(new SqsPollingQueueReaderOptions{ QueueUrl = queueUrl });
+            services.AddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
 
             services.AddSingleton<ISqsPollingQueueReader, SqsSqsPollingQueueReader>();
-            
+
             return services;
         }
 
@@ -55,6 +56,19 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
+            services.AddHostedService<SqsPollingBackgroundService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddPollingSqsBackgroundServiceWithProcessor<T>(this IServiceCollection services) where T : class, IHostedService
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddHostedService<T>();
             services.AddHostedService<SqsPollingBackgroundService>();
 
             return services;
