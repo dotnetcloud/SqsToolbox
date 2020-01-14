@@ -37,7 +37,9 @@ namespace ConsoleAppSample
 
         public void OnNext(KeyValuePair<string, object> value)
         {
-            Console.WriteLine($"Event: {value.Key} ActivityName: {Activity.Current.OperationName} Id: {Activity.Current.Id} Payload: {value.Value}");
+            var (key, payload) = value;
+
+            Console.WriteLine($"Event: {key} ActivityName: {Activity.Current.OperationName} Id: {Activity.Current.Id} Payload: {payload}");
         }
 
         void IObserver<DiagnosticListener>.OnError(Exception error)
