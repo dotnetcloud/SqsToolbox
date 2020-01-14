@@ -1,33 +1,29 @@
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
-using Microsoft.Extensions.Hosting;
+using DotNetCloud.SqsToolbox.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace WorkerServiceSample
 {
-    public class Worker : BackgroundService
+    public class Worker : SqsMessageProcessingBackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly IPollingQueueReader<Message> _pollingQueue;
 
-        public Worker(ILogger<Worker> logger, IPollingQueueReader<Message> pollingQueue)
+        public Worker(ILogger<Worker> logger, ISqsPollingQueueReader sqsPollingQueueReader) 
+            : base(sqsPollingQueueReader)
         {
-            _logger = logger;
-            _pollingQueue = pollingQueue;
+            _logger = logger;            
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public override async Task ProcessFromChannel(ChannelReader<Message> channelReader, CancellationToken cancellationToken)
         {
-            _pollingQueue.Start(stoppingToken);
-
-            await foreach (var message in _pollingQueue.ChannelReader.ReadAllAsync(stoppingToken))
+            await foreach (var message in channelReader.ReadAllAsync(cancellationToken))
             {
                 _logger.LogInformation(message.Body);
             }
-
-            await _pollingQueue.StopAsync();
         }
     }
 }

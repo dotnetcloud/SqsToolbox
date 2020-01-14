@@ -12,9 +12,9 @@ using DotNetCloud.SqsToolbox.Abstractions;
 
 namespace DotNetCloud.SqsToolbox
 {
-    public class SqsPollingQueueReader : IPollingQueueReader<Message>, IDisposable
+    public class SqsSqsPollingQueueReader : ISqsPollingQueueReader, IDisposable
     {
-        public const string DiagnosticListenerName = "DotNetCloud.SqsToolbox.SqsPollingQueueReader";
+        public const string DiagnosticListenerName = "DotNetCloud.SqsToolbox.SqsSqsPollingQueueReader";
 
         private readonly SqsPollingQueueReaderOptions _queueReaderOptions;
         private readonly IAmazonSQS _amazonSqs;
@@ -24,10 +24,13 @@ namespace DotNetCloud.SqsToolbox
         private CancellationTokenSource _cancellationTokenSource;
         private Task _pollingTask;
         private bool _disposed;
+        private bool _isStarted;
+
+        private int _emptyResponseCounter;
 
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs)
+        public SqsSqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
@@ -50,6 +53,11 @@ namespace DotNetCloud.SqsToolbox
         /// <inheritdoc />
         public void Start(CancellationToken cancellationToken = default)
         {
+            if (_isStarted)
+                throw new InvalidOperationException("The queue reader is already started.");
+
+            _isStarted = true;
+
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             _pollingTask = Task.Run(PollForMessagesAsync, cancellationToken);
@@ -58,6 +66,9 @@ namespace DotNetCloud.SqsToolbox
         /// <inheritdoc />
         public async Task StopAsync()
         {
+            if (!_isStarted)
+                return;
+
             _cancellationTokenSource?.Cancel();
 
             await _pollingTask;
@@ -94,8 +105,7 @@ namespace DotNetCloud.SqsToolbox
                         if (_diagnostics.IsEnabled(Diagnostics.ReceiveMessagesBeginRequest))
                             _diagnostics.Write(Diagnostics.ReceiveMessagesBeginRequest, new { _queueReaderOptions.QueueUrl });
 
-                        response = await _amazonSqs.ReceiveMessageAsync(_receiveMessageRequest,
-                            _cancellationTokenSource.Token);
+                        response = await _amazonSqs.ReceiveMessageAsync(_receiveMessageRequest, _cancellationTokenSource.Token);
 
                         if (_diagnostics.IsEnabled(Diagnostics.ReceiveMessagesRequestComplete))
                             _diagnostics.Write(Diagnostics.ReceiveMessagesRequestComplete, new { _queueReaderOptions.QueueUrl, MessageCount = response.Messages.Count });
@@ -107,7 +117,7 @@ namespace DotNetCloud.SqsToolbox
 
                         activity?.AddTag("error", "true");
 
-                        await Task.Delay(TimeSpan.FromMinutes(1)); // Wait for 1 minute before trying to receive from the queue
+                        await Task.Delay(_queueReaderOptions.DelayWhenOverLimit); // Wait for 1 minute before trying to receive from the queue
                     }
                     catch (AmazonSQSException ex)
                     {
@@ -115,6 +125,8 @@ namespace DotNetCloud.SqsToolbox
                             _diagnostics.Write(Diagnostics.AmazonSqsException, new ExceptionData(ex, _receiveMessageRequest));
 
                         activity?.AddTag("error", "true");
+
+                        break;
                     }
                     catch (Exception ex)
                     {
@@ -122,11 +134,15 @@ namespace DotNetCloud.SqsToolbox
                             _diagnostics.Write(Diagnostics.Exception, new ExceptionData(ex, _receiveMessageRequest));
 
                         activity?.AddTag("error", "true");
+
+                        break;
                     }
                     finally
                     {
                         if (activity is object)
+                        {
                             _diagnostics.StopActivity(activity, new { response });
+                        }
                     }
 
                     if (response is null || response.HttpStatusCode != HttpStatusCode.OK)
@@ -137,12 +153,38 @@ namespace DotNetCloud.SqsToolbox
                     // Status code was 200-OK
 
                     await PublishMessagesAsync(response.Messages);
+
+                    await DelayNextRequestIfRequired(response.Messages);
                 }
             }
             finally
             {
                 writer.TryComplete();
             }
+        }
+
+        private Task DelayNextRequestIfRequired(IEnumerable<Message> messages)
+        {
+            if (!messages.Any())
+            {
+                _emptyResponseCounter = 0;
+
+                return Task.CompletedTask;
+            }
+            
+            if (_emptyResponseCounter < 5)
+            {
+                _emptyResponseCounter++;
+            }
+
+            var delaySeconds = _queueReaderOptions.InitialDelayWhenEmpty.Seconds;
+
+            if (_queueReaderOptions.UseExponentialBackoff)
+            {
+                delaySeconds *= (2 ^ _emptyResponseCounter);
+            }
+
+            return Task.Delay(TimeSpan.FromSeconds(delaySeconds));
         }
 
         private async Task PublishMessagesAsync(IReadOnlyList<Message> messages)

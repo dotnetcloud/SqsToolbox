@@ -1,5 +1,4 @@
 ﻿using System;
-using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,10 +20,12 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             }
 
             services.AddSingleton(new SqsPollingQueueReaderOptions{ QueueUrl = queueUrl });
-            services.AddSingleton<IPollingQueueReader<Message>, SqsPollingQueueReader>();
+
+            services.AddSingleton<ISqsPollingQueueReader, SqsSqsPollingQueueReader>();
             
             return services;
         }
+
 
         public static IServiceCollection AddPollingSqs(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure)
         {
@@ -42,7 +43,19 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
 
-            services.AddSingleton<IPollingQueueReader<Message>, SqsPollingQueueReader>();
+            services.AddSingleton<ISqsPollingQueueReader, SqsSqsPollingQueueReader>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddPollingSqsBackgroundService(this IServiceCollection services)
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddHostedService<SqsPollingBackgroundService>();
 
             return services;
         }

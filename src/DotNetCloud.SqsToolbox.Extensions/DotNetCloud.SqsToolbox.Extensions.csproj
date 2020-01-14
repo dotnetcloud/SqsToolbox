@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
       <Description>.NET Core extensions to support DI registration.</Description>
       <Copyright>Copyright (c) 2020, Steve Gordon</Copyright>
-      <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFramework>netcoreapp2.1</TargetFramework>
       <Version>1.0.0-preview.1</Version>
       <AssemblyVersion>1.0.0.0</AssemblyVersion>
       <FileVersion>1.0.0.0</FileVersion>
@@ -16,11 +16,13 @@
       <RepositoryType>git</RepositoryType>
       <RepositoryUrl>git://github.com/dotnetcloud/SqsToolbox</RepositoryUrl>
       <Authors>Steve Gordon</Authors>
+      <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.0" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
     </ItemGroup>
 

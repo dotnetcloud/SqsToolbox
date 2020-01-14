@@ -17,8 +17,14 @@ namespace WorkerServiceSample
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddAWSService<IAmazonSQS>();
-                    services.AddPollingSqs(opt => opt.QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/sq-test-queue-reader");
+                    services.AddPollingSqs(opt =>
+                    {
+                        opt.QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue";
+                        opt.ChannelCapacity = 150;
+                        opt.MaxMessages = 11;
+                    });
                     services.AddHostedService<Worker>();
+                    services.AddPollingSqsBackgroundService();
                 });
     }
 }

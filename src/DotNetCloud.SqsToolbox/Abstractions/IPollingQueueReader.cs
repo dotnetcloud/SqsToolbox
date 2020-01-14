@@ -1,18 +1,19 @@
 ﻿using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Amazon.SQS.Model;
 
 namespace DotNetCloud.SqsToolbox.Abstractions
 {
     /// <summary>
     /// Once started, polls a queue for messages, writing them to a channel, until stopped.
     /// </summary>
-    public interface IPollingQueueReader<T> where T : class
+    public interface ISqsPollingQueueReader
     {
         /// <summary>
         /// The <see cref="ChannelReader"/> from which received messages can be read for processing.
         /// </summary>
-        ChannelReader<T> ChannelReader { get; }
+        ChannelReader<Message> ChannelReader { get; }
 
         /// <summary>
         /// Start polling the queue for messages.
