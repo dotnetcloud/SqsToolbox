@@ -12,7 +12,7 @@ namespace DotNetCloud.SqsToolbox.Tests
         {
             var sut = new SqsPollingDelayer(new SqsPollingQueueReaderOptions 
             { 
-                InitialDelayWhenEmpty = TimeSpan.FromSeconds(1) 
+                InitialDelay = TimeSpan.FromSeconds(2) 
             });
 
             var result = sut.CalculateSecondsToDelay(new Message[] { new Message() });
@@ -25,12 +25,12 @@ namespace DotNetCloud.SqsToolbox.Tests
         {
             var sut = new SqsPollingDelayer(new SqsPollingQueueReaderOptions
             {
-                InitialDelayWhenEmpty = TimeSpan.FromSeconds(1)
+                InitialDelay = TimeSpan.FromSeconds(2)
             });
 
             var result = sut.CalculateSecondsToDelay(Array.Empty<Message>());
 
-            result.TotalSeconds.Should().Be(1);
+            result.TotalSeconds.Should().Be(2);
         }
 
         [Fact]
@@ -38,14 +38,65 @@ namespace DotNetCloud.SqsToolbox.Tests
         {
             var sut = new SqsPollingDelayer(new SqsPollingQueueReaderOptions
             {
-                InitialDelayWhenEmpty = TimeSpan.FromSeconds(1)
+                InitialDelay = TimeSpan.FromSeconds(2)
             });
 
             sut.CalculateSecondsToDelay(Array.Empty<Message>());
 
             var result = sut.CalculateSecondsToDelay(Array.Empty<Message>());
 
-            result.TotalSeconds.Should().Be(2);
+            result.TotalSeconds.Should().Be(4);
+        }
+
+        [Fact]
+        public void ReturnsInitialValueToPowerOfThree_OThirdEmptyResponse()
+        {
+            var sut = new SqsPollingDelayer(new SqsPollingQueueReaderOptions
+            {
+                InitialDelay = TimeSpan.FromSeconds(2)
+            });
+
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+
+            var result = sut.CalculateSecondsToDelay(Array.Empty<Message>());
+
+            result.TotalSeconds.Should().Be(8);
+        }
+
+        [Fact]
+        public void ReturnsInitialValueToPowerOfFour_OFourthEmptyResponse()
+        {
+            var sut = new SqsPollingDelayer(new SqsPollingQueueReaderOptions
+            {
+                InitialDelay = TimeSpan.FromSeconds(2)
+            });
+
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+
+            var result = sut.CalculateSecondsToDelay(Array.Empty<Message>());
+
+            result.TotalSeconds.Should().Be(16);
+        }
+
+        [Fact]
+        public void ReturnsInitialValueToPowerOfFive_OFifthEmptyResponse()
+        {
+            var sut = new SqsPollingDelayer(new SqsPollingQueueReaderOptions
+            {
+                InitialDelay = TimeSpan.FromSeconds(2)
+            });
+
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+            sut.CalculateSecondsToDelay(Array.Empty<Message>());
+
+            var result = sut.CalculateSecondsToDelay(Array.Empty<Message>());
+
+            result.TotalSeconds.Should().Be(32);
         }
     }
 }

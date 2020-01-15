@@ -32,7 +32,9 @@ namespace DotNetCloud.SqsToolbox
 
         public bool UseExponentialBackoff { get; set; } = true;
 
-        public TimeSpan InitialDelayWhenEmpty { get; set; } = TimeSpan.FromMinutes(1);
+        public TimeSpan InitialDelay { get; set; } = TimeSpan.FromMinutes(1);
+
+        public TimeSpan MaxDelay { get; set; } = TimeSpan.FromMinutes(1);
 
         public TimeSpan DelayWhenOverLimit { get; set; } = TimeSpan.FromMinutes(5);
     }

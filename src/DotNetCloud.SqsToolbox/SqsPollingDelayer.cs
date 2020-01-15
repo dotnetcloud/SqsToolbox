@@ -31,13 +31,10 @@ namespace DotNetCloud.SqsToolbox
                 _emptyResponseCounter++;
             }
 
-            var delaySeconds = (int)_queueReaderOptions.InitialDelayWhenEmpty.TotalSeconds;
+            var delaySeconds = _queueReaderOptions.InitialDelay.TotalSeconds;
 
-            if (_queueReaderOptions.UseExponentialBackoff && _emptyResponseCounter > 1)
-            {
-                delaySeconds = delaySeconds ^ _emptyResponseCounter;
-            }
-
+            delaySeconds = Math.Pow(delaySeconds, _emptyResponseCounter);
+            
             return TimeSpan.FromSeconds(delaySeconds);
         }
     }
