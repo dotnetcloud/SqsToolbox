@@ -154,7 +154,9 @@ namespace DotNetCloud.SqsToolbox
 
                     await PublishMessagesAsync(response.Messages);
 
-                    await _pollingDelayer.Delay(response.Messages, _cancellationTokenSource.Token);
+                    var delayTimeSpan = _pollingDelayer.CalculateSecondsToDelay(response.Messages);
+
+                    await Task.Delay(delayTimeSpan);
                 }
             }
             finally

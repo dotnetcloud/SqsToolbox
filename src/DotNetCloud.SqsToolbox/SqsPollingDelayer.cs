@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 
@@ -19,12 +17,13 @@ namespace DotNetCloud.SqsToolbox
             _queueReaderOptions = queueReaderOptions;
         }
 
-        public async Task<int> Delay(IEnumerable<Message> messages, CancellationToken cancellationToken)
+        public TimeSpan CalculateSecondsToDelay(IEnumerable<Message> messages)
         {
             if (messages.Any())
             {
                 _emptyResponseCounter = 0;
-                return _emptyResponseCounter;
+
+                return TimeSpan.Zero;
             }
 
             if (_emptyResponseCounter < 5)
@@ -32,16 +31,14 @@ namespace DotNetCloud.SqsToolbox
                 _emptyResponseCounter++;
             }
 
-            var delaySeconds = _queueReaderOptions.InitialDelayWhenEmpty.TotalSeconds;
+            var delaySeconds = (int)_queueReaderOptions.InitialDelayWhenEmpty.TotalSeconds;
 
             if (_queueReaderOptions.UseExponentialBackoff && _emptyResponseCounter > 1)
             {
-                delaySeconds *= 2 ^ (_emptyResponseCounter - 1);
+                delaySeconds = delaySeconds ^ _emptyResponseCounter;
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken);
-
-            return _emptyResponseCounter;
+            return TimeSpan.FromSeconds(delaySeconds);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ConsoleAppSample
 
         void IObserver<DiagnosticListener>.OnNext(DiagnosticListener diagnosticListener)
         {
-            if (diagnosticListener.Name == SqsSqsPollingQueueReader.DiagnosticListenerName)
+            if (diagnosticListener.Name == SqsPollingQueueReader.DiagnosticListenerName)
             {
                 var subscription = diagnosticListener.Subscribe(this);
                 _subscriptions.Add(subscription);
@@ -69,7 +69,9 @@ namespace ConsoleAppSample
             
             var client = new AmazonSQSClient(credentials, RegionEndpoint.EUWest1);
 
-            var pollingReader = new SqsSqsPollingQueueReader(new SqsPollingQueueReaderOptions{ QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" }, client);
+            var options = new SqsPollingQueueReaderOptions { QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" };
+
+            var pollingReader = new SqsPollingQueueReader(options, client, new SqsPollingDelayer(options));
 
             var readingTask = ReadFromChannel(pollingReader.ChannelReader);
 
