@@ -4,11 +4,11 @@
         <Description>A collection of tools, extensions and helpers for working with AWS Simple Queue Service (SQS) from .NET applications.</Description>
         <Copyright>Copyright (c) 2020, Steve Gordon</Copyright>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>1.0.0-alpha.1</Version>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-        <FileVersion>1.0.0.0</FileVersion>
-        <InformationalVersion>1.0.0 Alpha 1</InformationalVersion>
-        <PackageVersion>1.0.0-alpha.1</PackageVersion>
+        <Version>1.0.0-alpha.2</Version>
+        <AssemblyVersion>1.0.0.1</AssemblyVersion>
+        <FileVersion>1.0.0.1</FileVersion>
+        <InformationalVersion>1.0.0 Alpha 2</InformationalVersion>
+        <PackageVersion>1.0.0-alpha.2</PackageVersion>
         <PackageId>DotNetCloud.SqsToolbox</PackageId>
         <PackageTags>sqs;aws;toolbox;tools</PackageTags>
         <PackageProjectUrl>https://github.com/dotnetcloud/SqsToolbox</PackageProjectUrl>
@@ -19,7 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.SQS" Version="3.3.102.54" />
+        <PackageReference Include="AWSSDK.SQS" Version="3.3.102.56" />
         <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.7.0" />
         <PackageReference Include="System.Threading.Channels" Version="4.7.0" />
     </ItemGroup>
