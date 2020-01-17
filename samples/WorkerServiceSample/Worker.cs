@@ -23,6 +23,11 @@ namespace WorkerServiceSample
             await foreach (var message in channelReader.ReadAllAsync(cancellationToken))
             {
                 _logger.LogInformation(message.Body);
+
+                foreach (var (key, value) in message.Attributes)
+                {
+                    _logger.LogInformation($"{key} = {value}");
+                }
             }
         }
     }

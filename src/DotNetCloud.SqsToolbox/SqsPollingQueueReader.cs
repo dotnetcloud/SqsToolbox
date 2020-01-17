@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
+using DotNetCloud.SqsToolbox.Diagnostics;
 
 namespace DotNetCloud.SqsToolbox
 {
@@ -40,12 +41,19 @@ namespace DotNetCloud.SqsToolbox
                 SingleWriter = true
             });
 
-            _receiveMessageRequest = new ReceiveMessageRequest
+            if (queueReaderOptions.ReceiveMessageRequest is object)
             {
-                QueueUrl = queueReaderOptions.QueueUrl ?? throw new ArgumentNullException(nameof(queueReaderOptions), "A queue URL is required for the polling queue reader to be created"),
-                MaxNumberOfMessages = queueReaderOptions.MaxMessages,
-                WaitTimeSeconds = queueReaderOptions.PollTimeInSeconds
-            };
+                _receiveMessageRequest = queueReaderOptions.ReceiveMessageRequest;
+            }
+            else
+            {
+                _receiveMessageRequest = new ReceiveMessageRequest
+                {
+                    QueueUrl = queueReaderOptions.QueueUrl ?? throw new ArgumentNullException(nameof(queueReaderOptions), "A queue URL is required for the polling queue reader to be created"),
+                    MaxNumberOfMessages = queueReaderOptions.MaxMessages,
+                    WaitTimeSeconds = queueReaderOptions.PollTimeInSeconds
+                };
+            }
         }
 
         public ChannelReader<Message> ChannelReader => _channel.Reader;
@@ -82,58 +90,35 @@ namespace DotNetCloud.SqsToolbox
             {
                 while (!_cancellationTokenSource.IsCancellationRequested && await writer.WaitToWriteAsync(_cancellationTokenSource.Token))
                 {
-                    Activity activity = null;
-
-                    if (_diagnostics.IsEnabled() && _diagnostics.IsEnabled(Diagnostics.PollingForMessages))
-                    {
-                        activity = new Activity(Diagnostics.PollingForMessages);
-
-                        if (_diagnostics.IsEnabled(Diagnostics.PollingForMessagesStart))
-                        {
-                            _diagnostics.StartActivity(activity, new { _receiveMessageRequest });
-                        }
-                        else
-                        {
-                            activity.Start();
-                        }
-                    }
+                    var activity = StartActivity();
 
                     ReceiveMessageResponse response = null;
 
                     try
                     {
-                        if (_diagnostics.IsEnabled(Diagnostics.ReceiveMessagesBeginRequest))
-                            _diagnostics.Write(Diagnostics.ReceiveMessagesBeginRequest, new { _queueReaderOptions.QueueUrl });
+                        DiagnosticsStart();
 
                         response = await _amazonSqs.ReceiveMessageAsync(_receiveMessageRequest, _cancellationTokenSource.Token);
 
-                        if (_diagnostics.IsEnabled(Diagnostics.ReceiveMessagesRequestComplete))
-                            _diagnostics.Write(Diagnostics.ReceiveMessagesRequestComplete, new { _queueReaderOptions.QueueUrl, MessageCount = response.Messages.Count });
+                        DiagnosticsEnd(response);
                     }
                     catch (OverLimitException ex) // May be the case if the maximum number of in-flight messages is reached
                     {
-                        if (_diagnostics.IsEnabled(Diagnostics.OverLimitException))
-                            _diagnostics.Write(Diagnostics.OverLimitException, new ExceptionData(ex, _receiveMessageRequest));
+                        DiagnosticsOverLimit(ex, activity);
 
-                        activity?.AddTag("error", "true");
+                        await Task.Delay(_queueReaderOptions.DelayWhenOverLimit);
 
-                        await Task.Delay(_queueReaderOptions.DelayWhenOverLimit); // Wait for 1 minute before trying to receive from the queue
+                        continue;
                     }
                     catch (AmazonSQSException ex)
                     {
-                        if (_diagnostics.IsEnabled(Diagnostics.AmazonSqsException))
-                            _diagnostics.Write(Diagnostics.AmazonSqsException, new ExceptionData(ex, _receiveMessageRequest));
-
-                        activity?.AddTag("error", "true");
+                        DiagnosticsSqsException(ex, activity);
 
                         break;
                     }
                     catch (Exception ex)
                     {
-                        if (_diagnostics.IsEnabled(Diagnostics.Exception))
-                            _diagnostics.Write(Diagnostics.Exception, new ExceptionData(ex, _receiveMessageRequest));
-
-                        activity?.AddTag("error", "true");
+                        DiagnosticsException(ex, activity);
 
                         break;
                     }
@@ -163,6 +148,65 @@ namespace DotNetCloud.SqsToolbox
             {
                 writer.TryComplete();
             }
+        }
+
+        private void DiagnosticsException(Exception ex, Activity activity)
+        {
+            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.Exception))
+                _diagnostics.Write(Diagnostics.Diagnostics.Exception, new ExceptionData(ex, _receiveMessageRequest));
+
+            activity?.AddTag("error", "true");
+        }
+
+        private void DiagnosticsSqsException(AmazonSQSException ex, Activity activity)
+        {
+            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.AmazonSqsException))
+                _diagnostics.Write(Diagnostics.Diagnostics.AmazonSqsException, new ExceptionData(ex, _receiveMessageRequest));
+
+            activity?.AddTag("error", "true");
+        }
+
+        private void DiagnosticsOverLimit(OverLimitException ex, Activity activity)
+        {
+            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.OverLimitException))
+                _diagnostics.Write(Diagnostics.Diagnostics.OverLimitException, new ExceptionData(ex, _receiveMessageRequest));
+
+            activity?.AddTag("error", "true");
+        }
+
+        private Activity StartActivity()
+        {
+            Activity activity = null;
+
+            if (_diagnostics.IsEnabled() && _diagnostics.IsEnabled(Diagnostics.Diagnostics.PollingForMessages))
+            {
+                activity = new Activity(Diagnostics.Diagnostics.PollingForMessages);
+
+                if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.PollingForMessagesStart))
+                {
+                    _diagnostics.StartActivity(activity, new {_receiveMessageRequest});
+                }
+                else
+                {
+                    activity.Start();
+                }
+            }
+
+            return activity;
+        }
+
+        private void DiagnosticsEnd(ReceiveMessageResponse response)
+        {
+            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.ReceiveMessagesRequestComplete))
+                _diagnostics.Write(Diagnostics.Diagnostics.ReceiveMessagesRequestComplete,
+                    new EndRequestPayload {QueueUrl = _queueReaderOptions.QueueUrl, MessageCount = response.Messages.Count});
+        }
+
+        private void DiagnosticsStart()
+        {
+            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.ReceiveMessagesBeginRequest))
+                _diagnostics.Write(Diagnostics.Diagnostics.ReceiveMessagesBeginRequest,
+                    new BeginRequestPayload(_queueReaderOptions.QueueUrl));
         }
 
         private async Task PublishMessagesAsync(IReadOnlyList<Message> messages)

@@ -1,4 +1,5 @@
 ﻿using System;
+using Amazon.SQS.Model;
 
 namespace DotNetCloud.SqsToolbox
 {
@@ -37,5 +38,7 @@ namespace DotNetCloud.SqsToolbox
         public TimeSpan MaxDelay { get; set; } = TimeSpan.FromMinutes(1);
 
         public TimeSpan DelayWhenOverLimit { get; set; } = TimeSpan.FromMinutes(5);
+
+        public ReceiveMessageRequest ReceiveMessageRequest { get; set; }
     }
 }

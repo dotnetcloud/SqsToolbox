@@ -1,4 +1,4 @@
-﻿namespace DotNetCloud.SqsToolbox
+﻿namespace DotNetCloud.SqsToolbox.Diagnostics
 {
     public static class Diagnostics
     {

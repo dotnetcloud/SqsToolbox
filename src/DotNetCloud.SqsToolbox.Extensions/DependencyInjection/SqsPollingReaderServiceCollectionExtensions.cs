@@ -64,7 +64,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddPollingSqsBackgroundServiceWithProcessor<T>(this IServiceCollection services) where T : class, IHostedService
+        public static IServiceCollection AddPollingSqsBackgroundServiceWithProcessor<T>(this IServiceCollection services) where T : SqsMessageProcessingBackgroundService
         {
             if (services is null)
             {

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Amazon.SQS;
+using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
