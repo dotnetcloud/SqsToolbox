@@ -1,8 +1,8 @@
 ﻿using System;
 using DotNetCloud.SqsToolbox.Abstractions;
+using DotNetCloud.SqsToolbox.Extensions.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
@@ -73,6 +73,18 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             services.AddHostedService<T>();
             services.AddHostedService<SqsPollingBackgroundService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddDiagnosticsMonitoring<T>(this IServiceCollection services) where T : DiagnosticsMonitoringService
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddHostedService<T>();
 
             return services;
         }

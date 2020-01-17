@@ -1,9 +1,17 @@
 ﻿namespace DotNetCloud.SqsToolbox.Diagnostics
 {
-    public class EndRequestPayload
+    public sealed class EndRequestPayload
     {
-        public string QueueUrl { get; set; }
+        internal EndRequestPayload(string queueUrl, int messageCount)
+        {
+            QueueUrl = queueUrl;
+            MessageCount = messageCount;
+        }
 
-        public int MessageCount { get; set; }
+        public string QueueUrl { get; }
+
+        public int MessageCount { get; }
+
+        public override string ToString() => $"Received {MessageCount} messages from {QueueUrl}";
     }
 }

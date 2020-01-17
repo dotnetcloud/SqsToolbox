@@ -27,7 +27,7 @@ namespace DotNetCloud.SqsToolbox
         private Task _pollingTask;
         private bool _disposed;
         private bool _isStarted;
-        
+
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
         public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer)
@@ -152,24 +152,24 @@ namespace DotNetCloud.SqsToolbox
 
         private void DiagnosticsException(Exception ex, Activity activity)
         {
-            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.Exception))
-                _diagnostics.Write(Diagnostics.Diagnostics.Exception, new ExceptionData(ex, _receiveMessageRequest));
+            if (_diagnostics.IsEnabled(DiagnosticEvents.Exception))
+                _diagnostics.Write(DiagnosticEvents.Exception, new ExceptionPayload(ex, _receiveMessageRequest));
 
             activity?.AddTag("error", "true");
         }
 
         private void DiagnosticsSqsException(AmazonSQSException ex, Activity activity)
         {
-            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.AmazonSqsException))
-                _diagnostics.Write(Diagnostics.Diagnostics.AmazonSqsException, new ExceptionData(ex, _receiveMessageRequest));
+            if (_diagnostics.IsEnabled(DiagnosticEvents.AmazonSqsException))
+                _diagnostics.Write(DiagnosticEvents.AmazonSqsException, new ExceptionPayload(ex, _receiveMessageRequest));
 
             activity?.AddTag("error", "true");
         }
 
         private void DiagnosticsOverLimit(OverLimitException ex, Activity activity)
         {
-            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.OverLimitException))
-                _diagnostics.Write(Diagnostics.Diagnostics.OverLimitException, new ExceptionData(ex, _receiveMessageRequest));
+            if (_diagnostics.IsEnabled(DiagnosticEvents.OverLimitException))
+                _diagnostics.Write(DiagnosticEvents.OverLimitException, new ExceptionPayload(ex, _receiveMessageRequest));
 
             activity?.AddTag("error", "true");
         }
@@ -178,13 +178,13 @@ namespace DotNetCloud.SqsToolbox
         {
             Activity activity = null;
 
-            if (_diagnostics.IsEnabled() && _diagnostics.IsEnabled(Diagnostics.Diagnostics.PollingForMessages))
+            if (_diagnostics.IsEnabled() && _diagnostics.IsEnabled(DiagnosticEvents.PollingForMessages))
             {
-                activity = new Activity(Diagnostics.Diagnostics.PollingForMessages);
+                activity = new Activity(DiagnosticEvents.PollingForMessages);
 
-                if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.PollingForMessagesStart))
+                if (_diagnostics.IsEnabled(DiagnosticEvents.PollingForMessagesStart))
                 {
-                    _diagnostics.StartActivity(activity, new {_receiveMessageRequest});
+                    _diagnostics.StartActivity(activity, new { _receiveMessageRequest });
                 }
                 else
                 {
@@ -197,15 +197,15 @@ namespace DotNetCloud.SqsToolbox
 
         private void DiagnosticsEnd(ReceiveMessageResponse response)
         {
-            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.ReceiveMessagesRequestComplete))
-                _diagnostics.Write(Diagnostics.Diagnostics.ReceiveMessagesRequestComplete,
-                    new EndRequestPayload {QueueUrl = _queueReaderOptions.QueueUrl, MessageCount = response.Messages.Count});
+            if (_diagnostics.IsEnabled(DiagnosticEvents.ReceiveMessagesRequestComplete))
+                _diagnostics.Write(DiagnosticEvents.ReceiveMessagesRequestComplete,
+                    new EndRequestPayload(_queueReaderOptions.QueueUrl, response.Messages.Count));
         }
 
         private void DiagnosticsStart()
         {
-            if (_diagnostics.IsEnabled(Diagnostics.Diagnostics.ReceiveMessagesBeginRequest))
-                _diagnostics.Write(Diagnostics.Diagnostics.ReceiveMessagesBeginRequest,
+            if (_diagnostics.IsEnabled(DiagnosticEvents.ReceiveMessagesBeginRequest))
+                _diagnostics.Write(DiagnosticEvents.ReceiveMessagesBeginRequest,
                     new BeginRequestPayload(_queueReaderOptions.QueueUrl));
         }
 
@@ -246,20 +246,6 @@ namespace DotNetCloud.SqsToolbox
 
                 _disposed = true;
             }
-        }
-
-        private sealed class ExceptionData
-        {
-            internal ExceptionData(Exception exception, ReceiveMessageRequest request)
-            {
-                Exception = exception;
-                Request = request;
-            }
-
-            private Exception Exception { get; }
-            private ReceiveMessageRequest Request { get; }
-
-            public override string ToString() => $"{{ {nameof(Exception)} = {Exception}, {nameof(Request)} = {Request} }}";
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace DotNetCloud.SqsToolbox.Diagnostics
 {
-    public static class Diagnostics
+    public static class DiagnosticEvents
     {
         public const string PollingForMessages = "DotNetCloud.SqsToolbox.PollingForMessages";
 
