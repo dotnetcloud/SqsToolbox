@@ -52,6 +52,27 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection AddSqsBatchDeletion(this IServiceCollection services, Action<SqsBatchDeleterOptions> configure)
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (configure is null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+
+            services.Configure(configure);
+
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeleterOptions>>()?.Value);
+
+            services.TryAddSingleton<ISqsBatchDeleter, SqsBatchDeleter>();
+
+            return services;
+        }
+
         public static IServiceCollection AddPollingSqsBackgroundService(this IServiceCollection services)
         {
             if (services is null)
@@ -60,6 +81,20 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             }
 
             services.AddHostedService<SqsPollingBackgroundService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddSqsBatchDeletionBackgroundService(this IServiceCollection services, Action<SqsBatchDeleterOptions> configure)
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            AddSqsBatchDeletion(services, configure);
+
+            services.AddHostedService<SqsBatchDeleteBackgroundService>();
 
             return services;
         }
@@ -77,7 +112,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddDiagnosticsMonitoring<T>(this IServiceCollection services) where T : DiagnosticsMonitoringService
+        public static IServiceCollection AddSqsToolboxDiagnosticsMonitoring<T>(this IServiceCollection services) where T : DiagnosticsMonitoringService
         {
             if (services is null)
             {
