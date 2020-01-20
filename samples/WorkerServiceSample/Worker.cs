@@ -11,11 +11,13 @@ namespace WorkerServiceSample
     public class Worker : SqsMessageProcessingBackgroundService
     {
         private readonly ILogger<Worker> _logger;
+        private readonly ISqsBatchDeleter _sqsBatchDeleter;
 
-        public Worker(ILogger<Worker> logger, ISqsPollingQueueReader sqsPollingQueueReader) 
+        public Worker(ILogger<Worker> logger, ISqsPollingQueueReader sqsPollingQueueReader, ISqsBatchDeleter sqsBatchDeleter) 
             : base(sqsPollingQueueReader)
         {
-            _logger = logger;            
+            _logger = logger;
+            _sqsBatchDeleter = sqsBatchDeleter;
         }
 
         public override async Task ProcessFromChannel(ChannelReader<Message> channelReader, CancellationToken cancellationToken)
@@ -28,6 +30,8 @@ namespace WorkerServiceSample
                 {
                     _logger.LogInformation($"{key} = {value}");
                 }
+
+                await _sqsBatchDeleter.AddMessageAsync(message, cancellationToken);
             }
         }
     }

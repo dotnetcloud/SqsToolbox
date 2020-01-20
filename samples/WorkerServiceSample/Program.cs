@@ -1,6 +1,5 @@
-using System.Collections.Generic;
+using System;
 using Amazon.SQS;
-using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,11 +21,19 @@ namespace WorkerServiceSample
 
                     services.AddPollingSqs(opt =>
                     {
-                        opt.QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue";
+                        opt.QueueUrl = "https://sqs.eu-west-2.amazonaws.com/123456789012/test-queue";
                         opt.ChannelCapacity = 150;
                     });
                     
                     services.AddPollingSqsBackgroundServiceWithProcessor<Worker>();
+                    services.AddSqsToolboxDiagnosticsMonitoring<DiagnosticsMonitorService>();
+
+                    services.AddSqsBatchDeletionBackgroundService(opt =>
+                    {
+                        opt.QueueUrl = "https://sqs.eu-west-2.amazonaws.com/123456789012/test-queue";
+                        opt.DrainOnStop = true;
+                        opt.MaxWaitForFullBatch = TimeSpan.FromSeconds(10);
+                    });
                 });
     }
 }
