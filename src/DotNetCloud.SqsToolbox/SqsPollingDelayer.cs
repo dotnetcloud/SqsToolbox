@@ -33,7 +33,10 @@ namespace DotNetCloud.SqsToolbox
 
             var delaySeconds = _queueReaderOptions.InitialDelay.TotalSeconds;
 
-            delaySeconds = Math.Pow(delaySeconds, _emptyResponseCounter);
+            if (_queueReaderOptions.UseExponentialBackoff)
+            {
+                delaySeconds = Math.Pow(delaySeconds, _emptyResponseCounter);
+            }
             
             return TimeSpan.FromSeconds(delaySeconds);
         }
