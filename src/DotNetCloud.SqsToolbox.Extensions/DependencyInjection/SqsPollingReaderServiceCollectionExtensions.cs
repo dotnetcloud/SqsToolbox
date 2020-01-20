@@ -112,6 +112,21 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection AddPollingSqsBackgroundServiceWithProcessor<T>(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure) where T : SqsMessageProcessingBackgroundService
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            AddPollingSqs(services, configure);
+
+            services.AddHostedService<T>();
+            services.AddHostedService<SqsPollingBackgroundService>();
+
+            return services;
+        }
+
         public static IServiceCollection AddSqsToolboxDiagnosticsMonitoring<T>(this IServiceCollection services) where T : DiagnosticsMonitoringService
         {
             if (services is null)
