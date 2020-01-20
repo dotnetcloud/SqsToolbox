@@ -16,6 +16,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>git://github.com/dotnetcloud/SqsToolbox</RepositoryUrl>
         <Authors>Steve Gordon</Authors>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

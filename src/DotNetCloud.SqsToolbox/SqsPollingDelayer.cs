@@ -35,7 +35,7 @@ namespace DotNetCloud.SqsToolbox
 
             if (_queueReaderOptions.UseExponentialBackoff)
             {
-                delaySeconds = Math.Pow(delaySeconds, _emptyResponseCounter);
+                delaySeconds = Math.Max(Math.Pow(delaySeconds, _emptyResponseCounter), _queueReaderOptions.MaxDelay.TotalSeconds);
             }
             
             return TimeSpan.FromSeconds(delaySeconds);
