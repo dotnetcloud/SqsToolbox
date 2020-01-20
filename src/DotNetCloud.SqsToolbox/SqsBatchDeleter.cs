@@ -92,9 +92,9 @@ namespace DotNetCloud.SqsToolbox
 
             while (await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
-                using var timeOutCts = new CancellationTokenSource(_sqsBatchDeleterOptions.MaxWaitForFullBatch);
-                
-                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeOutCts.Token);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+                linkedCts.CancelAfter(_sqsBatchDeleterOptions.MaxWaitForFullBatch);
 
                 await CreateBatchAsync(linkedCts.Token).ConfigureAwait(false);
                 
