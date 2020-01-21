@@ -1,7 +1,7 @@
 ﻿using System;
 using Amazon.SQS.Model;
 
-namespace DotNetCloud.SqsToolbox
+namespace DotNetCloud.SqsToolbox.PollingRead
 {
     public class SqsPollingQueueReaderOptions
     {

@@ -1,6 +1,8 @@
 ﻿using System;
+using Amazon.SQS;
 using DotNetCloud.SqsToolbox.Abstractions;
 using DotNetCloud.SqsToolbox.Extensions.Diagnostics;
+using DotNetCloud.SqsToolbox.PollingRead;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -21,10 +23,9 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(queueUrl));
             }
 
-            services.TryAddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
+            AddPollingSqsCore(services);
 
-            services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
-            services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
+            services.TryAddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
 
             return services;
         }
@@ -42,33 +43,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(configure));
             }
 
+            AddPollingSqsCore(services);
+
             services.Configure(configure);
 
             services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
-
-            services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
-            services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddSqsBatchDeletion(this IServiceCollection services, Action<SqsBatchDeleterOptions> configure)
-        {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            if (configure is null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
-
-            services.Configure(configure);
-
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeleterOptions>>()?.Value);
-
-            services.TryAddSingleton<ISqsBatchDeleter, SqsBatchDeleter>();
 
             return services;
         }
@@ -81,20 +60,6 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             }
 
             services.AddHostedService<SqsPollingBackgroundService>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddSqsBatchDeletionBackgroundService(this IServiceCollection services, Action<SqsBatchDeleterOptions> configure)
-        {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            AddSqsBatchDeletion(services, configure);
-
-            services.AddHostedService<SqsBatchDeleteBackgroundService>();
 
             return services;
         }
@@ -137,6 +102,13 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             services.AddHostedService<T>();
 
             return services;
+        }
+
+        private static void AddPollingSqsCore(IServiceCollection services)
+        {
+            services.TryAddAWSService<IAmazonSQS>();
+            services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
+            services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
         }
     }
 }

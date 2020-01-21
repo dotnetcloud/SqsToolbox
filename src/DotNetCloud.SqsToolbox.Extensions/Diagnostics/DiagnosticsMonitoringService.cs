@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Diagnostics;
+using DotNetCloud.SqsToolbox.PollingRead;
 using Microsoft.Extensions.Hosting;
 
 namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics

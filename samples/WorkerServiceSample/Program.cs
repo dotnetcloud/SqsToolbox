@@ -27,12 +27,13 @@ namespace WorkerServiceSample
 
                     services.AddSqsToolboxDiagnosticsMonitoring<DiagnosticsMonitorService>();
                     
-                    services.AddSqsBatchDeletionBackgroundService(opt =>
+                    services.AddSqsBatchDeletion(opt =>
                     {
                         opt.QueueUrl = "https://sqs.eu-west-2.amazonaws.com/123456789012/test-queue";
                         opt.DrainOnStop = true;
                         opt.MaxWaitForFullBatch = TimeSpan.FromSeconds(10);
-                    });
+                    })
+                    .WithBackgroundService();
                 });
     }
 }

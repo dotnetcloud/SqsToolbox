@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
+using DotNetCloud.SqsToolbox;
 using DotNetCloud.SqsToolbox.Abstractions;
 using DotNetCloud.SqsToolbox.Extensions;
 using Microsoft.Extensions.Logging;
@@ -11,13 +12,13 @@ namespace WorkerServiceSample
     public class Worker : SqsMessageProcessingBackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly ISqsBatchDeleter _sqsBatchDeleter;
+        private readonly ISqsBatchDeleteQueue _sqsBatchDeleteQueue;
 
-        public Worker(ILogger<Worker> logger, ISqsPollingQueueReader sqsPollingQueueReader, ISqsBatchDeleter sqsBatchDeleter) 
+        public Worker(ILogger<Worker> logger, ISqsPollingQueueReader sqsPollingQueueReader, ISqsBatchDeleteQueue sqsBatchDeleteQueue) 
             : base(sqsPollingQueueReader)
         {
             _logger = logger;
-            _sqsBatchDeleter = sqsBatchDeleter;
+            _sqsBatchDeleteQueue = sqsBatchDeleteQueue;
         }
 
         public override async Task ProcessFromChannel(ChannelReader<Message> channelReader, CancellationToken cancellationToken)
@@ -31,7 +32,7 @@ namespace WorkerServiceSample
                     _logger.LogInformation($"{key} = {value}");
                 }
 
-                await _sqsBatchDeleter.AddMessageAsync(message, cancellationToken);
+                await _sqsBatchDeleteQueue.AddMessageAsync(message, cancellationToken);
             }
         }
     }

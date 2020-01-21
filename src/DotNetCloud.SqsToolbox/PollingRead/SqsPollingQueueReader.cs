@@ -11,7 +11,7 @@ using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 using DotNetCloud.SqsToolbox.Diagnostics;
 
-namespace DotNetCloud.SqsToolbox
+namespace DotNetCloud.SqsToolbox.PollingRead
 {
     public class SqsPollingQueueReader : ISqsPollingQueueReader, IDisposable
     {

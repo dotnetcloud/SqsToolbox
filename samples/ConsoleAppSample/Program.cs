@@ -10,6 +10,8 @@ using Amazon.Runtime.CredentialManagement;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox;
+using DotNetCloud.SqsToolbox.BatchDelete;
+using DotNetCloud.SqsToolbox.PollingRead;
 
 namespace ConsoleAppSample
 {

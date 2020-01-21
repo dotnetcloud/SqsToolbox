@@ -10,7 +10,7 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 
-namespace DotNetCloud.SqsToolbox
+namespace DotNetCloud.SqsToolbox.BatchDelete
 {
     public class SqsBatchDeleter : ISqsBatchDeleter, IDisposable
     {
