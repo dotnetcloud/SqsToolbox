@@ -37,7 +37,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
             _pollingDelayer = pollingDelayer;
 
-            _channel = Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
+            _channel = queueReaderOptions.Channel ?? Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
             {
                 SingleWriter = true
             });
@@ -117,7 +117,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
                     {
                         DiagnosticsSqsException(ex, activity);
 
-                        _pollingSqsExceptionHandler.OnSqsException(ex);
+                        _pollingSqsExceptionHandler.OnException(ex);
 
                         break;
                     }

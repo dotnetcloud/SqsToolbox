@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using DotNetCloud.SqsToolbox.BatchDelete;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
@@ -11,6 +15,15 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
         public ISqsBatchDeletionBuilder WithBackgroundService()
         {
             Services.AddHostedService<SqsBatchDeleteBackgroundService>();
+
+            return this;
+        }
+
+        public ISqsBatchDeletionBuilder Configure(Action<SqsBatchDeleterOptions> configure)
+        {
+            Services.PostConfigure(configure);
+
+            Services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeleterOptions>>()?.Value);
 
             return this;
         }

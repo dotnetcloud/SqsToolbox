@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Channels;
 using Amazon.SQS.Model;
 
 namespace DotNetCloud.SqsToolbox.PollingRead
@@ -40,5 +41,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
         public TimeSpan DelayWhenOverLimit { get; set; } = TimeSpan.FromMinutes(5);
 
         public ReceiveMessageRequest ReceiveMessageRequest { get; set; }
+
+        public Channel<Message> Channel { get; set; }
     }
 }
