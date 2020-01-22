@@ -3,6 +3,7 @@ using Amazon.SQS;
 using DotNetCloud.SqsToolbox.Abstractions;
 using DotNetCloud.SqsToolbox.Extensions.Diagnostics;
 using DotNetCloud.SqsToolbox.PollingRead;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -11,6 +12,22 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
     public static class SqsPollingReaderServiceCollectionExtensions
     {
+        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, IConfiguration configuration)
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            var queueUrl = configuration.GetSection("SQS")["ProcessingQueueUrl"];
+            
+            AddPollingSqsCore(services);
+
+            services.TryAddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
+
+            return new SqsPollingReaderBuilder(services);
+        }
+
         public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, string queueUrl)
         {
             if (services is null)
@@ -29,7 +46,6 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             return new SqsPollingReaderBuilder(services);
         }
-
 
         public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure)
         {
@@ -71,6 +87,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
             services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
             services.TryAddSingleton<IPollingSqsExceptionHandler, DefaultPollingSqsExceptionHandler>();
+            services.TryAddSingleton<DefaultConfigReader>();
         }
     }
 }

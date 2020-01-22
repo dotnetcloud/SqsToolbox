@@ -15,14 +15,10 @@ namespace WorkerServiceSample
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddPollingSqs(opt =>
-                    {
-                        opt.QueueUrl = "https://sqs.eu-west-2.amazonaws.com/123456789012/test-queue";
-                        opt.ChannelCapacity = 150;
-                    })
-                    .WithBackgroundService()
-                    .WithMessageProcessor<Worker>()
-                    .WithExceptionHandler<CustomExceptionHandler>();
+                    services.AddPollingSqs(hostContext.Configuration)
+                        .WithBackgroundService()
+                        .WithMessageProcessor<Worker>()
+                        .WithExceptionHandler<CustomExceptionHandler>();
 
                     services.AddSqsBatchDeletion(opt =>
                     {
