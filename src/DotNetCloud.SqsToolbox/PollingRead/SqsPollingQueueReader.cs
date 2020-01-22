@@ -22,6 +22,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
         private readonly ISqsPollingDelayer _pollingDelayer;
         private readonly Channel<Message> _channel;
         private readonly ReceiveMessageRequest _receiveMessageRequest;
+        private readonly IPollingSqsExceptionHandler _pollingSqsExceptionHandler;
 
         private CancellationTokenSource _cancellationTokenSource;
         private Task _pollingTask;
@@ -30,7 +31,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
 
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, IPollingSqsExceptionHandler pollingSqsExceptionHandler)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
@@ -54,6 +55,8 @@ namespace DotNetCloud.SqsToolbox.PollingRead
                     WaitTimeSeconds = queueReaderOptions.PollTimeInSeconds
                 };
             }
+
+            _pollingSqsExceptionHandler = pollingSqsExceptionHandler ?? new DefaultPollingSqsExceptionHandler();
         }
 
         public ChannelReader<Message> ChannelReader => _channel.Reader;
@@ -114,11 +117,15 @@ namespace DotNetCloud.SqsToolbox.PollingRead
                     {
                         DiagnosticsSqsException(ex, activity);
 
+                        _pollingSqsExceptionHandler.OnSqsException(ex);
+
                         break;
                     }
                     catch (Exception ex)
                     {
                         DiagnosticsException(ex, activity);
+
+                        _pollingSqsExceptionHandler.OnException(ex);
 
                         break;
                     }

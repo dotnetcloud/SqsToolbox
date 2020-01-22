@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>dotnet-WorkerServiceSample-5CED5C88-E568-4A84-B4C6-C619E7603431</UserSecretsId>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

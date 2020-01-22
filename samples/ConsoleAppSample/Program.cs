@@ -72,11 +72,11 @@ namespace ConsoleAppSample
 
             var options = new SqsPollingQueueReaderOptions { QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" };
 
-            var pollingReader = new SqsPollingQueueReader(options, client, new SqsPollingDelayer(options));
+            using var pollingReader = new SqsPollingQueueReader(options, client, new SqsPollingDelayer(options), null);
 
-            var deleter = new SqsBatchDeleter(new SqsBatchDeleterOptions { MaxWaitForFullBatch = TimeSpan.FromSeconds(10), DrainOnStop = true, QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" }, client);
+            using var deleter = new SqsBatchDeleter(new SqsBatchDeleterOptions { MaxWaitForFullBatch = TimeSpan.FromSeconds(10), DrainOnStop = true, QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" }, client);
 
-            var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
 
             var readingTask = ReadFromChannelAsync(pollingReader.ChannelReader, deleter, cts.Token);
 

@@ -11,7 +11,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
     public static class SqsPollingReaderServiceCollectionExtensions
     {
-        public static IServiceCollection AddPollingSqs(this IServiceCollection services, string queueUrl)
+        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, string queueUrl)
         {
             if (services is null)
             {
@@ -27,11 +27,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             services.TryAddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
 
-            return services;
+            return new SqsPollingReaderBuilder(services);
         }
 
 
-        public static IServiceCollection AddPollingSqs(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure)
+        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure)
         {
             if (services is null)
             {
@@ -49,47 +49,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
 
-            return services;
-        }
-
-        public static IServiceCollection AddPollingSqsBackgroundService(this IServiceCollection services)
-        {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            services.AddHostedService<SqsPollingBackgroundService>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddPollingSqsBackgroundServiceWithProcessor<T>(this IServiceCollection services) where T : SqsMessageProcessingBackgroundService
-        {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            services.AddHostedService<T>();
-            services.AddHostedService<SqsPollingBackgroundService>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddPollingSqsBackgroundServiceWithProcessor<T>(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure) where T : SqsMessageProcessingBackgroundService
-        {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            AddPollingSqs(services, configure);
-
-            services.AddHostedService<T>();
-            services.AddHostedService<SqsPollingBackgroundService>();
-
-            return services;
+            return new SqsPollingReaderBuilder(services);
         }
 
         public static IServiceCollection AddSqsToolboxDiagnosticsMonitoring<T>(this IServiceCollection services) where T : DiagnosticsMonitoringService
@@ -107,8 +67,10 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
         private static void AddPollingSqsCore(IServiceCollection services)
         {
             services.TryAddAWSService<IAmazonSQS>();
+
             services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
             services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
+            services.TryAddSingleton<IPollingSqsExceptionHandler, DefaultPollingSqsExceptionHandler>();
         }
     }
 }

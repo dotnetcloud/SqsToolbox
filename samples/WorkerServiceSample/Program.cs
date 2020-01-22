@@ -1,7 +1,5 @@
 using System;
-using Amazon.SQS;
 using DotNetCloud.SqsToolbox.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace WorkerServiceSample
@@ -17,16 +15,15 @@ namespace WorkerServiceSample
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddAWSService<IAmazonSQS>();
-
-                    services.AddPollingSqsBackgroundServiceWithProcessor<Worker>(opt =>
+                    services.AddPollingSqs(opt =>
                     {
                         opt.QueueUrl = "https://sqs.eu-west-2.amazonaws.com/123456789012/test-queue";
                         opt.ChannelCapacity = 150;
-                    });
+                    })
+                    .WithBackgroundService()
+                    .WithMessageProcessor<Worker>()
+                    .WithExceptionHandler<CustomExceptionHandler>();
 
-                    services.AddSqsToolboxDiagnosticsMonitoring<DiagnosticsMonitorService>();
-                    
                     services.AddSqsBatchDeletion(opt =>
                     {
                         opt.QueueUrl = "https://sqs.eu-west-2.amazonaws.com/123456789012/test-queue";
@@ -34,6 +31,8 @@ namespace WorkerServiceSample
                         opt.MaxWaitForFullBatch = TimeSpan.FromSeconds(10);
                     })
                     .WithBackgroundService();
+
+                    services.AddSqsToolboxDiagnosticsMonitoring<DiagnosticsMonitorService>();
                 });
     }
 }
