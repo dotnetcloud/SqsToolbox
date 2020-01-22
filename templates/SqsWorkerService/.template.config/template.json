@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Steve Gordon",
+    "classifications": [ "AWS", "Worker" ],
+    "identity": "DotNetCloud.SqsWorkerService",
+    "name": ".NET Cloud: SQS Message Processing Worker Service",
+    "shortName": "sqsworker",
+    "tags": {
+      "language": "C#",
+      "type": "project"
+    }
+  }
