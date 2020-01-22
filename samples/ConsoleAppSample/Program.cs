@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -9,7 +8,6 @@ using Amazon;
 using Amazon.Runtime.CredentialManagement;
 using Amazon.SQS;
 using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox;
 using DotNetCloud.SqsToolbox.BatchDelete;
 using DotNetCloud.SqsToolbox.PollingRead;
 
@@ -69,7 +67,7 @@ namespace ConsoleAppSample
             f.TryGetProfile("default", out var profile);
 
             var credentials = profile.GetAWSCredentials(null);
-            
+
             var client = new AmazonSQSClient(credentials, RegionEndpoint.EUWest2);
 
             var options = new SqsPollingQueueReaderOptions { QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" };
@@ -86,7 +84,7 @@ namespace ConsoleAppSample
             pollingReader.Start(cts.Token);
 
             await readingTask;
-            
+
             //for (var i = 0; i < 26; i++)
             //{
             //    await deleter.AddMessageAsync(new Message{ MessageId = Guid.NewGuid().ToString() }, cts.Token);
@@ -97,7 +95,7 @@ namespace ConsoleAppSample
             //await Task.Delay(TimeSpan.FromSeconds(8), cts.Token);
 
             //await deleter.AddMessageAsync(new Message { MessageId = Guid.NewGuid().ToString() }, cts.Token);
-            
+
             //await Task.Delay(TimeSpan.FromSeconds(15), cts.Token);
 
             //for (var i = 0; i < 11; i++)
@@ -117,7 +115,7 @@ namespace ConsoleAppSample
             //}
 
             //await Task.Delay(TimeSpan.FromSeconds(10), cts.Token);
-            
+
             await deleter.StopAsync();
 
             //await Task.Delay(Timeout.Infinite, cts.Token);
