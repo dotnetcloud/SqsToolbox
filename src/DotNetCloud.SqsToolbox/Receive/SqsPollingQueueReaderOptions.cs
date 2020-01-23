@@ -2,7 +2,7 @@
 using System.Threading.Channels;
 using Amazon.SQS.Model;
 
-namespace DotNetCloud.SqsToolbox.PollingRead
+namespace DotNetCloud.SqsToolbox.Receive
 {
     public class SqsPollingQueueReaderOptions
     {

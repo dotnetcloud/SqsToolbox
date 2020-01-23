@@ -1,5 +1,5 @@
 ﻿using System;
-using DotNetCloud.SqsToolbox.BatchDelete;
+using DotNetCloud.SqsToolbox.Delete;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {

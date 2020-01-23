@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotNetCloud.SqsToolbox.BatchDelete
+namespace DotNetCloud.SqsToolbox.Delete
 {
     public class SqsBatchDeleterOptions
     {

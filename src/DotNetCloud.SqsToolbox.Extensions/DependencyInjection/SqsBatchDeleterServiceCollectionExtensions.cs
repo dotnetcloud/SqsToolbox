@@ -1,7 +1,7 @@
 ﻿using System;
 using Amazon.SQS;
 using DotNetCloud.SqsToolbox.Abstractions;
-using DotNetCloud.SqsToolbox.BatchDelete;
+using DotNetCloud.SqsToolbox.Delete;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

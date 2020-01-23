@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox;
 using DotNetCloud.SqsToolbox.Abstractions;
 using DotNetCloud.SqsToolbox.Extensions;
 using Microsoft.Extensions.Logging;

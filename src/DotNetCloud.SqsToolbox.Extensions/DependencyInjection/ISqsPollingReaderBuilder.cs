@@ -1,4 +1,6 @@
-﻿using DotNetCloud.SqsToolbox.Abstractions;
+﻿using System;
+using DotNetCloud.SqsToolbox.Abstractions;
+using DotNetCloud.SqsToolbox.Receive;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
@@ -6,6 +8,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
     {
         ISqsPollingReaderBuilder WithBackgroundService();
         ISqsPollingReaderBuilder WithMessageProcessor<T>() where T : SqsMessageProcessingBackgroundService;
-        ISqsPollingReaderBuilder WithExceptionHandler<T>() where T : IPollingSqsExceptionHandler;
+        ISqsPollingReaderBuilder WithExceptionHandler<T>() where T : ISqsPollingExceptionHandler;
+        ISqsPollingReaderBuilder Configure(Action<SqsPollingQueueReaderOptions> configure);
+
+#if NETCOREAPP3_1
+        ISqsPollingReaderBuilder WithDefaultExceptionHandler();
+#endif
     }
 }

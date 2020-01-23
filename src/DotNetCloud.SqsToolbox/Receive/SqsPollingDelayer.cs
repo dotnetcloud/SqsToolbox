@@ -4,7 +4,7 @@ using System.Linq;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 
-namespace DotNetCloud.SqsToolbox.PollingRead
+namespace DotNetCloud.SqsToolbox.Receive
 {
     public class SqsPollingDelayer : ISqsPollingDelayer
     {

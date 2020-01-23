@@ -1,6 +1,6 @@
 ﻿using System;
 using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox.PollingRead;
+using DotNetCloud.SqsToolbox.Receive;
 using FluentAssertions;
 using Xunit;
 

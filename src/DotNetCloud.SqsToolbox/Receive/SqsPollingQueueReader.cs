@@ -11,7 +11,7 @@ using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 using DotNetCloud.SqsToolbox.Diagnostics;
 
-namespace DotNetCloud.SqsToolbox.PollingRead
+namespace DotNetCloud.SqsToolbox.Receive
 {
     public class SqsPollingQueueReader : ISqsPollingQueueReader, IDisposable
     {
@@ -22,7 +22,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
         private readonly ISqsPollingDelayer _pollingDelayer;
         private readonly Channel<Message> _channel;
         private readonly ReceiveMessageRequest _receiveMessageRequest;
-        private readonly IPollingSqsExceptionHandler _pollingSqsExceptionHandler;
+        private readonly ISqsPollingExceptionHandler _sqsPollingExceptionHandler;
 
         private CancellationTokenSource _cancellationTokenSource;
         private Task _pollingTask;
@@ -31,7 +31,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
 
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, IPollingSqsExceptionHandler pollingSqsExceptionHandler)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, ISqsPollingExceptionHandler sqsPollingExceptionHandler)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
@@ -56,7 +56,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
                 };
             }
 
-            _pollingSqsExceptionHandler = pollingSqsExceptionHandler ?? new DefaultPollingSqsExceptionHandler();
+            _sqsPollingExceptionHandler = sqsPollingExceptionHandler ?? DefaultSqsPollingExceptionHandler.Instance;
         }
 
         public ChannelReader<Message> ChannelReader => _channel.Reader;
@@ -117,7 +117,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
                     {
                         DiagnosticsSqsException(ex, activity);
 
-                        _pollingSqsExceptionHandler.OnException(ex);
+                        _sqsPollingExceptionHandler.OnException(ex);
 
                         break;
                     }
@@ -125,7 +125,7 @@ namespace DotNetCloud.SqsToolbox.PollingRead
                     {
                         DiagnosticsException(ex, activity);
 
-                        _pollingSqsExceptionHandler.OnException(ex);
+                        _sqsPollingExceptionHandler.OnException(ex);
 
                         break;
                     }

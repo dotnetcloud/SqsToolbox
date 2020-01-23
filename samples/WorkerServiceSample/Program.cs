@@ -12,10 +12,11 @@ namespace WorkerServiceSample
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddPollingSqs(hostContext.Configuration)
+                    services.AddPollingSqsFromConfiguration(hostContext.Configuration)
+                        .Configure(opt => opt.DelayWhenOverLimit = TimeSpan.FromMinutes(20))
                         .WithBackgroundService()
                         .WithMessageProcessor<Worker>()
-                        .WithExceptionHandler<CustomExceptionHandler>();
+                        .WithDefaultExceptionHandler();
 
                     services.AddSqsBatchDeletion(hostContext.Configuration)
                         .Configure(opt =>

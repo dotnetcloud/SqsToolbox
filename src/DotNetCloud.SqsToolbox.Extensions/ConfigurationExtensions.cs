@@ -1,5 +1,5 @@
-﻿using DotNetCloud.SqsToolbox.BatchDelete;
-using DotNetCloud.SqsToolbox.PollingRead;
+﻿using DotNetCloud.SqsToolbox.Delete;
+using DotNetCloud.SqsToolbox.Receive;
 using Microsoft.Extensions.Configuration;
 
 namespace DotNetCloud.SqsToolbox.Extensions

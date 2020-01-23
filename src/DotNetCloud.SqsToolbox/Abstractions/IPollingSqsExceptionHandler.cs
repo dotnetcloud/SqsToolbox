@@ -2,7 +2,7 @@
 
 namespace DotNetCloud.SqsToolbox.Abstractions
 {
-    public interface IPollingSqsExceptionHandler
+    public interface ISqsPollingExceptionHandler
     {
         void OnException<T>(T exception) where T : Exception;
     }

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 
-namespace DotNetCloud.SqsToolbox.BatchDelete
+namespace DotNetCloud.SqsToolbox.Delete
 {
     public class SqsBatchDeleteQueue : ISqsBatchDeleteQueue
     {
