@@ -26,6 +26,7 @@ namespace DotNetCloud.SqsToolbox.Delete
 
         private readonly Dictionary<string, string> _currentBatch;
         private readonly DeleteMessageBatchRequest _deleteMessageBatchRequest;
+        private readonly object _startLock = new object();
 
         public SqsBatchDeleter(SqsBatchDeleterOptions sqsBatchDeleterOptions, IAmazonSQS amazonSqs)
         {
@@ -50,11 +51,17 @@ namespace DotNetCloud.SqsToolbox.Delete
             if (_isStarted)
                 throw new InvalidOperationException("The batch deleter is already started.");
 
-            _isStarted = true;
-            
-            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            lock (_startLock)
+            {
+                if (_isStarted)
+                    throw new InvalidOperationException("The batch deleter is already started.");
 
-            _batchingTask = Task.Run(BatchAsync, cancellationToken);
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+                _batchingTask = Task.Run(BatchAsync, cancellationToken);
+
+                _isStarted = true;
+            }
         }
 
         public async Task StopAsync()
@@ -93,7 +100,6 @@ namespace DotNetCloud.SqsToolbox.Delete
             while (await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
                 using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
                 linkedCts.CancelAfter(_sqsBatchDeleterOptions.MaxWaitForFullBatch);
 
                 await CreateBatchAsync(linkedCts.Token).ConfigureAwait(false);

@@ -65,17 +65,17 @@ namespace DotNetCloud.SqsToolbox.Receive
         /// <inheritdoc />
         public void Start(CancellationToken cancellationToken = default)
         {
+            if (_isStarted)
+                throw new InvalidOperationException("The queue reader is already started.");
+
             lock (_startLock)
             {
-                if (_isStarted)
-                    throw new InvalidOperationException("The queue reader is already started.");
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+                _pollingTask = Task.Run(PollForMessagesAsync, cancellationToken);
 
                 _isStarted = true;
-            }
-
-            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            _pollingTask = Task.Run(PollForMessagesAsync, cancellationToken);
+            }            
         }
 
         /// <inheritdoc />
