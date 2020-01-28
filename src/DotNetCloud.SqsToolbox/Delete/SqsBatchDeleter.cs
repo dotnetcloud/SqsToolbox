@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
+using DotNetCloud.SqsToolbox.Diagnostics;
 
 namespace DotNetCloud.SqsToolbox.Delete
 {
     public class SqsBatchDeleter : ISqsBatchDeleter, IDisposable
     {
+        public const string DiagnosticListenerName = "DotNetCloud.SqsToolbox.SqsBatchDeleter";
+
         private readonly SqsBatchDeleterOptions _sqsBatchDeleterOptions;
         private readonly IAmazonSQS _amazonSqs;
         private readonly Channel<Message> _channel;
@@ -27,6 +30,8 @@ namespace DotNetCloud.SqsToolbox.Delete
         private readonly Dictionary<string, string> _currentBatch;
         private readonly DeleteMessageBatchRequest _deleteMessageBatchRequest;
         private readonly object _startLock = new object();
+
+        private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
         public SqsBatchDeleter(SqsBatchDeleterOptions sqsBatchDeleterOptions, IAmazonSQS amazonSqs)
         {
@@ -121,6 +126,7 @@ namespace DotNetCloud.SqsToolbox.Delete
                     foreach (var entry in sqsDeleteBatchResponse.Failed)
                     {
                         // diagnostics
+                        // retry handler?
                     }
                 }
             }
@@ -149,10 +155,19 @@ namespace DotNetCloud.SqsToolbox.Delete
             }
             catch (OperationCanceledException)
             {
-                // swallow
+                // swallow this as expected when batch is not full within timeout period
             }
 
-            Console.WriteLine($"Created batch with {_currentBatch.Count} items, in {sw.ElapsedMilliseconds} milliseconds");
+            sw.Stop();
+            
+            BatchCreatedDiagnostics(_currentBatch.Count, sw);
+        }
+
+        private static void BatchCreatedDiagnostics(int messageCount, Stopwatch stopwatch)
+        {
+            if (_diagnostics.IsEnabled(DiagnosticEvents.DeletionBatchCreated))
+                _diagnostics.Write(DiagnosticEvents.DeletionBatchCreated,
+                    new DeletionBatchCreatedPayload(messageCount, stopwatch.ElapsedMilliseconds));
         }
 
         public void Dispose()

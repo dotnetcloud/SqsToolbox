@@ -15,5 +15,7 @@
         public const string AmazonSqsException = "DotNetCloud.SqsToolbox.AmazonSQSException";
 
         public const string Exception = "DotNetCloud.SqsToolbox.Exception";
+
+        public const string DeletionBatchCreated = "DotNetCloud.SqsToolbox.DeletionBatchCreated";
     }
 }

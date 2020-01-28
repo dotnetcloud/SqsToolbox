@@ -1,8 +1,8 @@
 ﻿namespace DotNetCloud.SqsToolbox.Diagnostics
 {
-    public sealed class BeginRequestPayload
+    public sealed class BeginReceiveRequestPayload
     {
-        internal BeginRequestPayload(string queueUrl)
+        internal BeginReceiveRequestPayload(string queueUrl)
         {
             QueueUrl = queueUrl;
         }

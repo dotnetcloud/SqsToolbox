@@ -27,11 +27,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             return this;
         }
 
-        public ISqsPollingReaderBuilder WithExceptionHandler<T>() where T : ISqsPollingExceptionHandler
+        public ISqsPollingReaderBuilder WithExceptionHandler<T>() where T : IExceptionHandler
         {
-            Services.RemoveAll(typeof(ISqsPollingExceptionHandler));
+            Services.RemoveAll(typeof(IExceptionHandler));
 
-            Services.AddSingleton(typeof(ISqsPollingExceptionHandler), typeof(T));
+            Services.AddSingleton(typeof(IExceptionHandler), typeof(T));
 
             return this;
         }
@@ -48,7 +48,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 #if NETCOREAPP3_1
         public ISqsPollingReaderBuilder WithDefaultExceptionHandler()
         {
-            Services.AddSingleton<ISqsPollingExceptionHandler, StopPollingExceptionHandler>();
+            Services.AddSingleton<IExceptionHandler, StopApplicationExceptionHandler>();
 
             return this;
         }

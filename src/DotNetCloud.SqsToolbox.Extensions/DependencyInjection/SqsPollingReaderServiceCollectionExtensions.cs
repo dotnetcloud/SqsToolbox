@@ -86,7 +86,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
             services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
-            services.TryAddSingleton<ISqsPollingExceptionHandler, DefaultSqsPollingExceptionHandler>();
+            services.TryAddSingleton<IExceptionHandler, DefaultExceptionHandler>();
         }
     }
 }

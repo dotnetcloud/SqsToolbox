@@ -28,7 +28,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
                             {
                                 case DiagnosticEvents.ReceiveMessagesBeginRequest:
                                 {
-                                    if (pair.Value is BeginRequestPayload payload)
+                                    if (pair.Value is BeginReceiveRequestPayload payload)
                                     {
                                         OnBegin(payload.QueueUrl);
                                     }
@@ -37,7 +37,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
                                 }
                                 case DiagnosticEvents.ReceiveMessagesRequestComplete:
                                 {
-                                    if (pair.Value is EndRequestPayload payload)
+                                    if (pair.Value is EndReceiveRequestPayload payload)
                                     {
                                         OnReceived(payload.QueueUrl, payload.MessageCount);
                                     }

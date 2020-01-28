@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DotNetCloud.SqsToolbox.Extensions
 {
-    internal class StopPollingExceptionHandler : ISqsPollingExceptionHandler
+    internal class StopApplicationExceptionHandler : IExceptionHandler
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
-        private readonly ILogger<StopPollingExceptionHandler> _logger;
+        private readonly ILogger<StopApplicationExceptionHandler> _logger;
 
-        public StopPollingExceptionHandler(IHostApplicationLifetime hostApplicationLifetime, ILogger<StopPollingExceptionHandler> logger)
+        public StopApplicationExceptionHandler(IHostApplicationLifetime hostApplicationLifetime, ILogger<StopApplicationExceptionHandler> logger)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _logger = logger;

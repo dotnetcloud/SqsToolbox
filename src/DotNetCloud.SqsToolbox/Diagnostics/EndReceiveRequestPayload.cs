@@ -1,8 +1,8 @@
 ﻿namespace DotNetCloud.SqsToolbox.Diagnostics
 {
-    public sealed class EndRequestPayload
+    public sealed class EndReceiveRequestPayload
     {
-        internal EndRequestPayload(string queueUrl, int messageCount)
+        internal EndReceiveRequestPayload(string queueUrl, int messageCount)
         {
             QueueUrl = queueUrl;
             MessageCount = messageCount;

@@ -22,7 +22,7 @@ namespace WorkerServiceSample
                         .Configure(opt =>
                         {
                             opt.DrainOnStop = true;
-                            opt.MaxWaitForFullBatch = TimeSpan.FromSeconds(30);
+                            opt.MaxWaitForFullBatch = TimeSpan.FromSeconds(10);
                         })
                         .WithBackgroundService();
 

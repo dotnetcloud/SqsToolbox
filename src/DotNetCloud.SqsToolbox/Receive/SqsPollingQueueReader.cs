@@ -22,7 +22,7 @@ namespace DotNetCloud.SqsToolbox.Receive
         private readonly ISqsPollingDelayer _pollingDelayer;
         private readonly Channel<Message> _channel;
         private readonly ReceiveMessageRequest _receiveMessageRequest;
-        private readonly ISqsPollingExceptionHandler _sqsPollingExceptionHandler;
+        private readonly IExceptionHandler _exceptionHandler;
 
         private CancellationTokenSource _cancellationTokenSource;
         private Task _pollingTask;
@@ -32,7 +32,7 @@ namespace DotNetCloud.SqsToolbox.Receive
         private readonly object _startLock = new object();
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, ISqsPollingExceptionHandler sqsPollingExceptionHandler)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, IExceptionHandler exceptionHandler)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
@@ -57,7 +57,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                 };
             }
 
-            _sqsPollingExceptionHandler = sqsPollingExceptionHandler ?? DefaultSqsPollingExceptionHandler.Instance;
+            _exceptionHandler = exceptionHandler ?? DefaultExceptionHandler.Instance;
         }
 
         public ChannelReader<Message> ChannelReader => _channel.Reader;
@@ -121,7 +121,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                     {
                         DiagnosticsSqsException(ex, activity);
 
-                        _sqsPollingExceptionHandler.OnException(ex);
+                        _exceptionHandler.OnException(ex);
 
                         break;
                     }
@@ -129,7 +129,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                     {
                         DiagnosticsException(ex, activity);
 
-                        _sqsPollingExceptionHandler.OnException(ex);
+                        _exceptionHandler.OnException(ex);
 
                         break;
                     }
@@ -210,14 +210,14 @@ namespace DotNetCloud.SqsToolbox.Receive
         {
             if (_diagnostics.IsEnabled(DiagnosticEvents.ReceiveMessagesRequestComplete))
                 _diagnostics.Write(DiagnosticEvents.ReceiveMessagesRequestComplete,
-                    new EndRequestPayload(_queueReaderOptions.QueueUrl, response.Messages.Count));
+                    new EndReceiveRequestPayload(_queueReaderOptions.QueueUrl, response.Messages.Count));
         }
 
         private void DiagnosticsStart()
         {
             if (_diagnostics.IsEnabled(DiagnosticEvents.ReceiveMessagesBeginRequest))
                 _diagnostics.Write(DiagnosticEvents.ReceiveMessagesBeginRequest,
-                    new BeginRequestPayload(_queueReaderOptions.QueueUrl));
+                    new BeginReceiveRequestPayload(_queueReaderOptions.QueueUrl));
         }
 
         private async Task PublishMessagesAsync(IReadOnlyList<Message> messages)

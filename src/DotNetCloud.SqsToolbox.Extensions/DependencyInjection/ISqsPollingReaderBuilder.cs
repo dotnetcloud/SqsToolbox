@@ -8,7 +8,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
     {
         ISqsPollingReaderBuilder WithBackgroundService();
         ISqsPollingReaderBuilder WithMessageProcessor<T>() where T : SqsMessageProcessingBackgroundService;
-        ISqsPollingReaderBuilder WithExceptionHandler<T>() where T : ISqsPollingExceptionHandler;
+        ISqsPollingReaderBuilder WithExceptionHandler<T>() where T : IExceptionHandler;
         ISqsPollingReaderBuilder Configure(Action<SqsPollingQueueReaderOptions> configure);
 
 #if NETCOREAPP3_1
