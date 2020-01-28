@@ -19,11 +19,16 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var options = configuration.GetPollingQueueReaderOptions();
-            
             AddPollingSqsCore(services);
 
-            services.TryAddSingleton(options);
+            var options = configuration.GetPollingQueueReaderOptions();
+            
+            services.Configure<SqsPollingQueueReaderOptions>(opt =>
+            {
+                opt.CopyFrom(options);
+            });
+
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
 
             return new SqsPollingReaderBuilder(services);
         }
@@ -42,7 +47,12 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             AddPollingSqsCore(services);
 
-            services.TryAddSingleton(new SqsPollingQueueReaderOptions { QueueUrl = queueUrl });
+            services.Configure<SqsPollingQueueReaderOptions>(opt =>
+            {
+                opt.QueueUrl = queueUrl;
+            });
+
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
 
             return new SqsPollingReaderBuilder(services);
         }
@@ -87,6 +97,8 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
             services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
             services.TryAddSingleton<IExceptionHandler, DefaultExceptionHandler>();
+
+            services.TryAddSingleton<SqsQueueReaderChannelSource, DefaultSqsQueueReaderChannelSource>();
         }
     }
 }

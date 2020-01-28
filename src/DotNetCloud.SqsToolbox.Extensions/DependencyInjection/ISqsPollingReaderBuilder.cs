@@ -10,6 +10,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
         ISqsPollingReaderBuilder WithMessageProcessor<T>() where T : SqsMessageProcessingBackgroundService;
         ISqsPollingReaderBuilder WithExceptionHandler<T>() where T : IExceptionHandler;
         ISqsPollingReaderBuilder Configure(Action<SqsPollingQueueReaderOptions> configure);
+        ISqsPollingReaderBuilder WithChannelSource<T>() where T : SqsQueueReaderChannelSource;
 
 #if NETCOREAPP3_1
         ISqsPollingReaderBuilder WithDefaultExceptionHandler();

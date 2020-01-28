@@ -1,5 +1,6 @@
 using System;
 using DotNetCloud.SqsToolbox.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace WorkerServiceSample
@@ -12,8 +13,11 @@ namespace WorkerServiceSample
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddSingleton<ReceiveQueueChannel>();
+
                     services.AddPollingSqsFromConfiguration(hostContext.Configuration)
                         .Configure(opt => opt.DelayWhenOverLimit = TimeSpan.FromMinutes(20))
+                        .WithChannelSource<CustomSqsQueueReaderChannelSource>()
                         .WithBackgroundService()
                         .WithMessageProcessor<Worker>()
                         .WithDefaultExceptionHandler();

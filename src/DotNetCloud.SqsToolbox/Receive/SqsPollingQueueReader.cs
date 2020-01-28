@@ -32,16 +32,12 @@ namespace DotNetCloud.SqsToolbox.Receive
         private readonly object _startLock = new object();
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, IExceptionHandler exceptionHandler)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, IExceptionHandler exceptionHandler, SqsQueueReaderChannelSource channelSource = null)
+            : this(queueReaderOptions, channelSource)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
             _pollingDelayer = pollingDelayer;
-
-            _channel = queueReaderOptions.Channel ?? Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
-            {
-                SingleWriter = true
-            });
 
             if (queueReaderOptions.ReceiveMessageRequest is object)
             {
@@ -60,6 +56,14 @@ namespace DotNetCloud.SqsToolbox.Receive
             _exceptionHandler = exceptionHandler ?? DefaultExceptionHandler.Instance;
         }
 
+        internal SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, SqsQueueReaderChannelSource channelSource)
+        {
+            _channel = channelSource is object ? channelSource.GetChannel() : Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
+            {
+                SingleWriter = true
+            });
+        }
+
         public ChannelReader<Message> ChannelReader => _channel.Reader;
 
         /// <inheritdoc />
@@ -75,7 +79,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                 _pollingTask = Task.Run(PollForMessagesAsync, cancellationToken);
 
                 _isStarted = true;
-            }            
+            }
         }
 
         /// <inheritdoc />
