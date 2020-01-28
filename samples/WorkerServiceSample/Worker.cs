@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace WorkerServiceSample
 {
-    public class Worker : SqsMessageProcessingBackgroundService
+    public class QueueProcessor : SqsMessageProcessingBackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<QueueProcessor> _logger;
         private readonly ISqsBatchDeleteQueue _sqsBatchDeleteQueue;
 
-        public Worker(ILogger<Worker> logger, ISqsPollingQueueReader sqsPollingQueueReader, ISqsBatchDeleteQueue sqsBatchDeleteQueue) 
+        public QueueProcessor(ILogger<QueueProcessor> logger, ISqsPollingQueueReader sqsPollingQueueReader, ISqsBatchDeleteQueue sqsBatchDeleteQueue) 
             : base(sqsPollingQueueReader)
         {
             _logger = logger;

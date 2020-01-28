@@ -17,7 +17,7 @@ namespace DotNetCloud.SqsToolbox.Receive
             _capacity = capacity;
         }
 
-        protected internal override Channel<Message> InitialiseChannel()
+        protected override Channel<Message> InitialiseChannel()
         {
             return Channel.CreateBounded<Message>(new BoundedChannelOptions(_capacity));
         }

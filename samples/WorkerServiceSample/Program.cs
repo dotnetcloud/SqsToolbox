@@ -1,6 +1,5 @@
 using System;
 using DotNetCloud.SqsToolbox.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace WorkerServiceSample
@@ -13,14 +12,11 @@ namespace WorkerServiceSample
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddSingleton<ReceiveQueueChannel>();
-
-                    services.AddPollingSqsFromConfiguration(hostContext.Configuration)
-                        .Configure(opt => opt.DelayWhenOverLimit = TimeSpan.FromMinutes(20))
-                        .WithChannelSource<CustomSqsQueueReaderChannelSource>()
-                        .WithBackgroundService()
-                        .WithMessageProcessor<Worker>()
-                        .WithDefaultExceptionHandler();
+                    services.AddPollingSqsFromConfiguration(hostContext.Configuration) // Adds polling services to DI and attempts to parse config by conventions from the IConfiguration
+                        .Configure(opt => opt.UseExponentialBackoff = true) // Extra customisation if required
+                        .WithBackgroundService() // Registers the polling reader as a background service
+                        .WithMessageProcessor<QueueProcessor>() // Registers a service which handles received messages in order
+                        .WithDefaultExceptionHandler(); // Adds a handler which shuts down the app on unhandled/critical exceptions
 
                     services.AddSqsBatchDeletion(hostContext.Configuration)
                         .Configure(opt =>
@@ -32,5 +28,15 @@ namespace WorkerServiceSample
 
                     services.AddSqsToolboxDiagnosticsMonitoring<DiagnosticsMonitorService>();
                 });
+
+        //services.AddSingleton<ReceiveQueueChannel>();
+
+        //services.AddPollingSqsFromConfiguration(hostContext.Configuration)
+        //    .Configure(opt => opt.DelayWhenOverLimit = TimeSpan.FromMinutes(20))
+        //    .WithChannelSource<CustomSqsQueueReaderChannelSource>()
+        //    .WithBackgroundService()
+        //    .WithMessageProcessor<QueueProcessor>()
+        //    .WithDefaultExceptionHandler();
+
     }
 }

@@ -16,6 +16,6 @@ namespace DotNetCloud.SqsToolbox.Receive
             return _messageChannel;
         }
 
-        protected internal abstract Channel<Message> InitialiseChannel();
+        protected abstract Channel<Message> InitialiseChannel();
     }
 }
