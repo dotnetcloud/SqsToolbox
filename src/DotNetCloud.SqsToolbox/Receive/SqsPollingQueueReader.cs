@@ -108,7 +108,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                     try
                     {
                         DiagnosticsStart();
-
+                        
                         response = await _amazonSqs.ReceiveMessageAsync(_receiveMessageRequest, _cancellationTokenSource.Token).ConfigureAwait(false);
 
                         DiagnosticsEnd(response);
@@ -224,7 +224,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                     new BeginReceiveRequestPayload(_queueReaderOptions.QueueUrl));
         }
 
-        private async Task PublishMessagesAsync(IReadOnlyList<Message> messages)
+        private async ValueTask PublishMessagesAsync(IReadOnlyList<Message> messages)
         {
             if (!messages.Any())
                 return;
