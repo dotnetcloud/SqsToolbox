@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.Hosting;
 
-namespace DotNetCloud.SqsToolbox.Extensions
+namespace DotNetCloud.SqsToolbox.Extensions.Hosting
 {
     public class SqsPollingBackgroundService : IHostedService
     {

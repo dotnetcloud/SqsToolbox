@@ -1,5 +1,6 @@
 ﻿using System;
 using DotNetCloud.SqsToolbox.Delete;
+using DotNetCloud.SqsToolbox.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;

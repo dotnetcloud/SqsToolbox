@@ -5,7 +5,7 @@ using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.Hosting;
 
-namespace DotNetCloud.SqsToolbox.Extensions
+namespace DotNetCloud.SqsToolbox.Extensions.Hosting
 {
     public abstract class SqsMessageProcessingBackgroundService : BackgroundService
     {

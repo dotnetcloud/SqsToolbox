@@ -142,10 +142,8 @@ namespace DotNetCloud.SqsToolbox.Delete
 
             try
             {
-                while (_currentBatch.Count < 10)
-                {
-                    await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false);
-                    
+                while (_currentBatch.Count < 10 && await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
+                {   
                     var exitBatchCreation = !_channel.Reader.TryRead(out var message) || cancellationToken.IsCancellationRequested;
                     
                     if (exitBatchCreation) continue;

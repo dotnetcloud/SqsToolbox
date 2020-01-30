@@ -3,7 +3,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Abstractions;
-using DotNetCloud.SqsToolbox.Extensions;
+using DotNetCloud.SqsToolbox.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace WorkerServiceSample

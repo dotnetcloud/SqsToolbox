@@ -1,5 +1,6 @@
 ﻿using System;
 using DotNetCloud.SqsToolbox.Abstractions;
+using DotNetCloud.SqsToolbox.Extensions.Hosting;
 using DotNetCloud.SqsToolbox.Receive;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
