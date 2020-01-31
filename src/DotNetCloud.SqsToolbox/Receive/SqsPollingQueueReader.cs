@@ -37,7 +37,7 @@ namespace DotNetCloud.SqsToolbox.Receive
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
-            _pollingDelayer = pollingDelayer;
+            _pollingDelayer = pollingDelayer ?? throw new ArgumentNullException(nameof(pollingDelayer));
 
             if (queueReaderOptions.ReceiveMessageRequest is object)
             {
@@ -74,6 +74,9 @@ namespace DotNetCloud.SqsToolbox.Receive
 
             lock (_startLock)
             {
+                if (_isStarted)
+                    throw new InvalidOperationException("The queue reader is already started.");
+
                 _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
                 _pollingTask = Task.Run(PollForMessagesAsync, cancellationToken);

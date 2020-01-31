@@ -9,16 +9,17 @@ namespace DotNetCloud.SqsToolbox.Receive
     public class SqsPollingDelayer : ISqsPollingDelayer
     {
         private readonly SqsPollingQueueReaderOptions _queueReaderOptions;
-
         private int _emptyResponseCounter;
 
         public SqsPollingDelayer(SqsPollingQueueReaderOptions queueReaderOptions)
         {
-            _queueReaderOptions = queueReaderOptions;
+            _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
         }
 
         public TimeSpan CalculateSecondsToDelay(IEnumerable<Message> messages)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             if (messages.Any())
             {
                 _emptyResponseCounter = 0;

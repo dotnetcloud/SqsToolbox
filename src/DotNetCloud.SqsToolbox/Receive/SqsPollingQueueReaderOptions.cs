@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Channels;
 using Amazon.SQS.Model;
 
 namespace DotNetCloud.SqsToolbox.Receive
@@ -41,20 +40,5 @@ namespace DotNetCloud.SqsToolbox.Receive
         public TimeSpan DelayWhenOverLimit { get; set; } = TimeSpan.FromMinutes(5);
 
         public ReceiveMessageRequest ReceiveMessageRequest { get; set; }
-    }
-
-    public static class SqsPollingQueueReaderOptionsExtensions
-    {
-        public static void CopyFrom(this SqsPollingQueueReaderOptions destination, SqsPollingQueueReaderOptions source)
-        {
-            destination.QueueUrl = source.QueueUrl;
-            destination.ChannelCapacity = source.ChannelCapacity;
-            destination.MaxMessages = source.MaxMessages;
-            destination.PollTimeInSeconds = source.PollTimeInSeconds;
-            destination.InitialDelay = source.InitialDelay;
-            destination.MaxDelay = source.MaxDelay;
-            destination.DelayWhenOverLimit = source.DelayWhenOverLimit;
-            destination.ReceiveMessageRequest = source.ReceiveMessageRequest;
-        }
     }
 }

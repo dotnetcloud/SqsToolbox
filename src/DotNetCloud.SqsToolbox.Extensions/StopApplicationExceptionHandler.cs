@@ -15,12 +15,14 @@ namespace DotNetCloud.SqsToolbox.Extensions
 
         public StopApplicationExceptionHandler(IHostApplicationLifetime hostApplicationLifetime, ILogger<StopApplicationExceptionHandler> logger)
         {
-            _hostApplicationLifetime = hostApplicationLifetime;
-            _logger = logger;
+            _hostApplicationLifetime = hostApplicationLifetime ?? throw new ArgumentNullException(nameof(hostApplicationLifetime));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void OnException<T>(T exception) where T : Exception
         {
+            _ = exception ?? throw new ArgumentNullException(nameof(exception));
+
             if (exception is AmazonSQSException)
             {
                 _logger.LogError(exception, "An amazon SQS exception was thrown: {ExceptionMessage}. Stopping application.", exception.Message);

@@ -10,15 +10,22 @@ using Microsoft.Extensions.Options;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// Extension methods for <see cref="ISqsPollingReaderBuilder"/>.
+    /// </summary>
     public static class SqsPollingReaderServiceCollectionExtensions
     {
-        public static ISqsPollingReaderBuilder AddPollingSqsFromConfiguration(this IServiceCollection services, IConfiguration configuration)
+        /// <summary>
+        /// Add services required for polling from an SQS queue, attempting to parse options from <see cref="IConfiguration"/>.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the polling SQS services to.</param>
+        /// <param name="configuration">The <see cref="IConfiguration"/> for the application.</param>
+        /// <returns>An instance of <see cref="ISqsPollingReaderBuilder"/> from which health checks can be registered.</returns>
+        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, IConfiguration configuration)
         {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
+            _ = services ?? throw new ArgumentNullException(nameof(services));
+            _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            
             AddPollingSqsCore(services);
 
             var options = configuration.GetPollingQueueReaderOptions();
@@ -28,22 +35,21 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 opt.CopyFrom(options);
             });
 
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>().Value);
 
             return new SqsPollingReaderBuilder(services);
         }
 
+        /// <summary>
+        /// Add services required for polling from an SQS queue using the provided <paramref name="queueUrl"/>.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the polling SQS services to.</param>
+        /// <param name="queueUrl">The URL of the SQS Queue to poll from.</param>
+        /// <returns></returns>
         public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, string queueUrl)
         {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            if (string.IsNullOrEmpty(queueUrl))
-            {
-                throw new ArgumentNullException(nameof(queueUrl));
-            }
+            _ = services ?? throw new ArgumentNullException(nameof(services));
+            _ = queueUrl ?? throw new ArgumentNullException(nameof(queueUrl));
 
             AddPollingSqsCore(services);
 
@@ -52,38 +58,34 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 opt.QueueUrl = queueUrl;
             });
 
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>().Value);
 
             return new SqsPollingReaderBuilder(services);
         }
 
+        /// <summary>
+        /// Add services required for polling from an SQS queue.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the polling SQS services to.</param>
+        /// <param name="configure">The <see cref="Action{SqsPollingQueueReaderOptions}"/> to configure the provided <see cref="SqsPollingQueueReaderOptions"/>.</param>
+        /// <returns></returns>
         public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure)
         {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            if (configure is null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
+            _ = services ?? throw new ArgumentNullException(nameof(services));
+            _ = configure ?? throw new ArgumentNullException(nameof(configure));
 
             AddPollingSqsCore(services);
 
             services.Configure(configure);
 
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>().Value);
 
             return new SqsPollingReaderBuilder(services);
         }
 
         public static IServiceCollection AddSqsToolboxDiagnosticsMonitoring<T>(this IServiceCollection services) where T : DiagnosticsMonitoringService
         {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+            _ = services ?? throw new ArgumentNullException(nameof(services));
 
             services.AddHostedService<T>();
 

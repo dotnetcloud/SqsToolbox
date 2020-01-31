@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.Hosting;
@@ -11,7 +12,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Hosting
 
         public SqsPollingBackgroundService(ISqsPollingQueueReader sqsPollingQueueReader)
         {
-            _sqsPollingQueueReader = sqsPollingQueueReader;
+            _sqsPollingQueueReader = sqsPollingQueueReader ?? throw new ArgumentNullException(nameof(sqsPollingQueueReader));
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

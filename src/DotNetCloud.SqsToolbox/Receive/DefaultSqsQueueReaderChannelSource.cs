@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System;
+using System.Threading.Channels;
 using Amazon.SQS.Model;
 
 namespace DotNetCloud.SqsToolbox.Receive
@@ -9,11 +10,15 @@ namespace DotNetCloud.SqsToolbox.Receive
 
         public DefaultSqsQueueReaderChannelSource(SqsPollingQueueReaderOptions queueReaderOptions)
         {
+            _ = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
+
             _capacity = queueReaderOptions.ChannelCapacity;
         }
 
         public DefaultSqsQueueReaderChannelSource(int capacity)
         {
+            if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity));
+
             _capacity = capacity;
         }
 

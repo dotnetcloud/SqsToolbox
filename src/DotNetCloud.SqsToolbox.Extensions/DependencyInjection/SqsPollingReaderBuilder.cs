@@ -10,7 +10,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
     public class SqsPollingReaderBuilder : ISqsPollingReaderBuilder
     {
-        public SqsPollingReaderBuilder(IServiceCollection services) => Services = services;
+        public SqsPollingReaderBuilder(IServiceCollection services) => Services = services ?? throw new ArgumentNullException(nameof(services));
 
         public IServiceCollection Services { get; }
 
@@ -39,9 +39,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
         public ISqsPollingReaderBuilder Configure(Action<SqsPollingQueueReaderOptions> configure)
         {
+            _ = configure ?? throw new ArgumentNullException(nameof(configure));
+
             Services.PostConfigure(configure);
 
-            Services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>()?.Value);
+            Services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>().Value);
 
             return this;
         }

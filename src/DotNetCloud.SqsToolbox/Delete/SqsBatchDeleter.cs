@@ -85,11 +85,15 @@ namespace DotNetCloud.SqsToolbox.Delete
 
         public async Task AddMessageAsync(Message message, CancellationToken cancellationToken = default)
         {
+            _ = message ?? throw new ArgumentNullException(nameof(message));
+
             await _channel.Writer.WriteAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task AddMessagesAsync(IList<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             var i = 0;
 
             while (i < messages.Count && await _channel.Writer.WaitToWriteAsync(cancellationToken).ConfigureAwait(false))

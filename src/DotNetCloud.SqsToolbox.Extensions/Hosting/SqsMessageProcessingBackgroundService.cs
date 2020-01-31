@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
@@ -13,7 +14,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Hosting
 
         protected SqsMessageProcessingBackgroundService(ISqsPollingQueueReader sqsPollingQueueReader)
         {
-            _sqsPollingQueueReader = sqsPollingQueueReader;
+            _sqsPollingQueueReader = sqsPollingQueueReader ?? throw new ArgumentNullException(nameof(sqsPollingQueueReader));
         }
 
         protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)

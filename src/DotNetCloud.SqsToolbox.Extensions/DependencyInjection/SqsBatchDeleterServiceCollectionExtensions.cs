@@ -11,14 +11,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
     public static class SqsBatchDeleterServiceCollectionExtensions
     {
-
         public static ISqsBatchDeletionBuilder AddSqsBatchDeletion(this IServiceCollection services, IConfiguration configuration)
         {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
+            _ = services ?? throw new ArgumentNullException(nameof(services));
+            _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            
             AddBatchDeleterCore(services);
 
             var options = configuration.GetSqsBatchDeleterOptions();
@@ -27,7 +24,9 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             {
                 opt.QueueUrl = options.QueueUrl;
             });
-            
+
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeleterOptions>>().Value);
+
             return new SqsBatchDeletionBuilder(services);
         }
 
@@ -40,19 +39,14 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
         /// <returns>An instance of <see cref="ISqsBatchDeletionBuilder"/> used to further configure the SQS batch deletion behaviour.</returns>
         public static ISqsBatchDeletionBuilder AddSqsBatchDeletion(this IServiceCollection services, Action<SqsBatchDeleterOptions> configure)
         {
-            if (services is null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            if (configure is null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
+            _ = services ?? throw new ArgumentNullException(nameof(services));
+            _ = configure ?? throw new ArgumentNullException(nameof(configure));
 
             AddBatchDeleterCore(services);
 
             services.Configure(configure);
+
+            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeleterOptions>>().Value);
 
             return new SqsBatchDeletionBuilder(services);
         }
@@ -63,8 +57,6 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 
             services.TryAddSingleton<ISqsBatchDeleter, SqsBatchDeleter>();
             services.TryAddSingleton<ISqsBatchDeleteQueue, SqsBatchDeleteQueue>();
-
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeleterOptions>>()?.Value);
         }
     }
 }
