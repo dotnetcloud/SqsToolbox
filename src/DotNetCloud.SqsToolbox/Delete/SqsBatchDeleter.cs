@@ -106,33 +106,39 @@ namespace DotNetCloud.SqsToolbox.Delete
         {
             var cancellationToken = _cancellationTokenSource.Token;
 
-            while (await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
+            try
             {
-                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                linkedCts.CancelAfter(_sqsBatchDeleterOptions.MaxWaitForFullBatch);
-
-                await CreateBatchAsync(linkedCts.Token).ConfigureAwait(false);
-                
-                _deleteMessageBatchRequest.Entries = _currentBatch.Select(m => new DeleteMessageBatchRequestEntry(m.Key, m.Value)).ToList();
-                
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var sqsDeleteBatchResponse = await _amazonSqs.DeleteMessageBatchAsync(_deleteMessageBatchRequest, cancellationToken).ConfigureAwait(false);
-
-                if (sqsDeleteBatchResponse.HttpStatusCode == HttpStatusCode.OK)
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    foreach (var entry in sqsDeleteBatchResponse.Successful)
-                    {
-                        // diagnostics
-                        Console.WriteLine($"Deleted {entry.Id}");
-                    }
+                    using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                    linkedCts.CancelAfter(_sqsBatchDeleterOptions.MaxWaitForFullBatch);
 
-                    foreach (var entry in sqsDeleteBatchResponse.Failed)
+                    await CreateBatchAsync(linkedCts.Token).ConfigureAwait(false);
+
+                    _deleteMessageBatchRequest.Entries = _currentBatch.Select(m => new DeleteMessageBatchRequestEntry(m.Key, m.Value)).ToList();
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var sw = Stopwatch.StartNew();
+
+                    var sqsDeleteBatchResponse = await _amazonSqs.DeleteMessageBatchAsync(_deleteMessageBatchRequest, cancellationToken).ConfigureAwait(false);
+
+                    sw.Stop();
+
+                    if (sqsDeleteBatchResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        // diagnostics
-                        // retry handler?
+                        BatchRequestCompletedDiagnostics(sqsDeleteBatchResponse, sw);
+                        
+                        foreach (var entry in sqsDeleteBatchResponse.Failed)
+                        {
+                            // Failure Handler
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Exception Handler
             }
 
             Console.WriteLine("Exiting BatchAsync");
@@ -170,6 +176,13 @@ namespace DotNetCloud.SqsToolbox.Delete
             if (_diagnostics.IsEnabled(DiagnosticEvents.DeletionBatchCreated))
                 _diagnostics.Write(DiagnosticEvents.DeletionBatchCreated,
                     new DeletionBatchCreatedPayload(messageCount, stopwatch.ElapsedMilliseconds));
+        }
+
+        private static void BatchRequestCompletedDiagnostics(DeleteMessageBatchResponse response, Stopwatch stopwatch)
+        {
+            if (_diagnostics.IsEnabled(DiagnosticEvents.DeleteBatchRequestComplete))
+                _diagnostics.Write(DiagnosticEvents.DeleteBatchRequestComplete,
+                    new EndDeletionBatchPayload(response, stopwatch.ElapsedMilliseconds));
         }
 
         public void Dispose()

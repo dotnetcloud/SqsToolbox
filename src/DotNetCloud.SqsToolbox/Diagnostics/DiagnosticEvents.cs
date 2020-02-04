@@ -17,5 +17,8 @@
         public const string Exception = "DotNetCloud.SqsToolbox.Exception";
 
         public const string DeletionBatchCreated = "DotNetCloud.SqsToolbox.DeletionBatchCreated";
+
+        public const string DeleteBatchRequestComplete = "DotNetCloud.SqsToolbox.DeleteBatchRequestComplete";
     }
 }
+`
