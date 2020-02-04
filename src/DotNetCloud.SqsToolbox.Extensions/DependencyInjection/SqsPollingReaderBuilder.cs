@@ -48,11 +48,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             return this;
         }
 
-        public ISqsPollingReaderBuilder WithChannelSource<T>() where T : SqsQueueReaderChannelSource
+        public ISqsPollingReaderBuilder WithChannelSource<T>() where T : SqsMessageChannelSource
         {
-            Services.RemoveAll<SqsQueueReaderChannelSource>();
+            Services.RemoveAll<SqsMessageChannelSource>();
 
-            Services.TryAddSingleton<SqsQueueReaderChannelSource, T>();
+            Services.TryAddSingleton<SqsMessageChannelSource, T>();
 
             return this;
         }

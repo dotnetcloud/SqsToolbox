@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
+using DotNetCloud.SqsToolbox.Delete;
 using DotNetCloud.SqsToolbox.Diagnostics;
 using DotNetCloud.SqsToolbox.Receive;
 using Microsoft.Extensions.Hosting;
@@ -23,28 +24,102 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
                 if (source.Name == SqsPollingQueueReader.DiagnosticListenerName)
                 {
                     _subscriptions.Add(source.Do(pair =>
+                    {
+                        switch (pair.Key)
                         {
-                            switch (pair.Key)
+                            case DiagnosticEvents.ReceiveMessagesBeginRequest:
                             {
-                                case DiagnosticEvents.ReceiveMessagesBeginRequest:
+                                if (pair.Value is BeginReceiveRequestPayload payload)
                                 {
-                                    if (pair.Value is BeginReceiveRequestPayload payload)
+                                    OnBegin(payload.QueueUrl);
+                                }
+
+                                break;
+                            }
+                            case DiagnosticEvents.ReceiveMessagesRequestComplete:
+                            {
+                                if (pair.Value is EndReceiveRequestPayload payload)
+                                {
+                                    OnReceived(payload.QueueUrl, payload.MessageCount);
+                                }
+
+                                break;
+                            }
+                            case DiagnosticEvents.DeletionBatchCreated:
+                            {
+                                if (pair.Value is DeletionBatchCreatedPayload payload)
+                                {
+                                    OnDeleteBatchCreated(payload.MessageCount, payload.MillisecondsTaken);
+                                }
+
+                                break;
+                            }
+                            case DiagnosticEvents.DeleteBatchRequestComplete:
+                            {
+                                if (pair.Value is EndDeletionBatchPayload payload)
+                                {
+                                    OnBatchDeleted(payload.DeleteMessageBatchResponse, payload.MillisecondsTaken);
+                                }
+
+                                break;
+                            }
+                            case DiagnosticEvents.OverLimitException:
+                            {
+                                if (pair.Value is ExceptionPayload payload)
+                                {
+                                    OnOverLimit(payload.Exception, payload.Request);
+                                }
+
+                                break;
+                            }
+                            case DiagnosticEvents.AmazonSqsException:
+                            {
+                                if (pair.Value is ExceptionPayload payload)
+                                {
+                                    OnSqsException(payload.Exception, payload.Request);
+                                }
+
+                                break;
+                            }
+                            case DiagnosticEvents.Exception:
+                            {
+                                if (pair.Value is ExceptionPayload payload)
+                                {
+                                    OnException(payload.Exception, payload.Request);
+                                }
+
+                                break;
+                            }
+                        }
+                    })
+                    .Subscribe());
+                }
+
+                if (source.Name == SqsBatchDeleter.DiagnosticListenerName)
+                {
+                    _subscriptions.Add(source.Do(pair =>
+                    {
+                        switch (pair.Key)
+                        {
+                          case DiagnosticEvents.DeletionBatchCreated:
+                                {
+                                    if (pair.Value is DeletionBatchCreatedPayload payload)
                                     {
-                                        OnBegin(payload.QueueUrl);
+                                        OnDeleteBatchCreated(payload.MessageCount, payload.MillisecondsTaken);
                                     }
 
                                     break;
                                 }
-                                case DiagnosticEvents.ReceiveMessagesRequestComplete:
+                            case DiagnosticEvents.DeleteBatchRequestComplete:
                                 {
-                                    if (pair.Value is EndReceiveRequestPayload payload)
+                                    if (pair.Value is EndDeletionBatchPayload payload)
                                     {
-                                        OnReceived(payload.QueueUrl, payload.MessageCount);
+                                        OnBatchDeleted(payload.DeleteMessageBatchResponse, payload.MillisecondsTaken);
                                     }
 
                                     break;
                                 }
-                                case DiagnosticEvents.OverLimitException:
+                            case DiagnosticEvents.OverLimitException:
                                 {
                                     if (pair.Value is ExceptionPayload payload)
                                     {
@@ -53,7 +128,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
 
                                     break;
                                 }
-                                case DiagnosticEvents.AmazonSqsException:
+                            case DiagnosticEvents.AmazonSqsException:
                                 {
                                     if (pair.Value is ExceptionPayload payload)
                                     {
@@ -62,7 +137,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
 
                                     break;
                                 }
-                                case DiagnosticEvents.Exception:
+                            case DiagnosticEvents.Exception:
                                 {
                                     if (pair.Value is ExceptionPayload payload)
                                     {
@@ -71,16 +146,16 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
 
                                     break;
                                 }
-                            }
-                        })
-                        .Subscribe());
+                        }
+                    })
+                    .Subscribe());
                 }
 
             }).Subscribe();
 
             return Task.CompletedTask;
         }
-
+        
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _allListenersSubscription?.Dispose();
@@ -101,7 +176,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
         {
         }
 
-        public virtual void OnReceived(string queueUrl, int messageCount)
+        public virtual void OnReceived(string queueUrl, in int messageCount)
         {
         }
 
@@ -114,6 +189,14 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
         }
 
         public virtual void OnException(Exception ex, ReceiveMessageRequest request)
+        {
+        }
+
+        public virtual void OnDeleteBatchCreated(in int messageCount, in long millisecondsTaken)
+        {
+        }
+
+        public virtual void OnBatchDeleted(DeleteMessageBatchResponse deleteMessageBatchResponse, in long millisecondsTaken)
         {
         }
     }

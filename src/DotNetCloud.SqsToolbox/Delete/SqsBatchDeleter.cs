@@ -17,8 +17,10 @@ namespace DotNetCloud.SqsToolbox.Delete
     {
         public const string DiagnosticListenerName = "DotNetCloud.SqsToolbox.SqsBatchDeleter";
 
-        private readonly SqsBatchDeleterOptions _sqsBatchDeleterOptions;
+        private readonly SqsBatchDeletionOptions _sqsBatchDeletionOptions;
         private readonly IAmazonSQS _amazonSqs;
+        private readonly IFailedDeletionEntryHandler _failedDeletionEntryHandler;
+        private readonly IExceptionHandler _exceptionHandler;
         private readonly Channel<Message> _channel;
 
         private CancellationTokenSource _cancellationTokenSource;
@@ -33,21 +35,30 @@ namespace DotNetCloud.SqsToolbox.Delete
 
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsBatchDeleter(SqsBatchDeleterOptions sqsBatchDeleterOptions, IAmazonSQS amazonSqs)
+        public SqsBatchDeleter(SqsBatchDeletionOptions sqsBatchDeletionOptions, IAmazonSQS amazonSqs, IExceptionHandler exceptionHandler, IFailedDeletionEntryHandler failedDeletionEntryHandler)
+            : this(sqsBatchDeletionOptions, amazonSqs, exceptionHandler, failedDeletionEntryHandler, null)
         {
-            _sqsBatchDeleterOptions = sqsBatchDeleterOptions;
-            _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
+        }
 
-            _channel = Channel.CreateBounded<Message>(new BoundedChannelOptions(_sqsBatchDeleterOptions.ChannelCapacity)
+        public SqsBatchDeleter(SqsBatchDeletionOptions sqsBatchDeletionOptions, IAmazonSQS amazonSqs, IExceptionHandler exceptionHandler, IFailedDeletionEntryHandler failedDeletionEntryHandler, Channel<Message> channel)
+        {
+            _ = sqsBatchDeletionOptions ?? throw new ArgumentNullException(nameof(sqsBatchDeletionOptions));
+
+            _sqsBatchDeletionOptions = sqsBatchDeletionOptions.Clone();
+            _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
+            _failedDeletionEntryHandler = failedDeletionEntryHandler ?? DefaultFailedDeletionEntryHandler.Instance;
+            _exceptionHandler = exceptionHandler ?? DefaultExceptionHandler.Instance;
+
+            _channel = channel ?? Channel.CreateBounded<Message>(new BoundedChannelOptions(_sqsBatchDeletionOptions.ChannelCapacity)
             {
                 SingleReader = true
             });
 
-            _currentBatch = new Dictionary<string, string>(sqsBatchDeleterOptions.BatchSize);
+            _currentBatch = new Dictionary<string, string>(sqsBatchDeletionOptions.BatchSize);
 
             _deleteMessageBatchRequest = new DeleteMessageBatchRequest
             {
-                QueueUrl = sqsBatchDeleterOptions.QueueUrl
+                QueueUrl = sqsBatchDeletionOptions.QueueUrl
             };
         }
 
@@ -71,11 +82,12 @@ namespace DotNetCloud.SqsToolbox.Delete
 
         public async Task StopAsync()
         {
-            if (!_isStarted) return;
+            if (!_isStarted)
+                return;
 
             _channel.Writer.TryComplete(); // nothing more will be written
 
-            if (!_sqsBatchDeleterOptions.DrainOnStop)
+            if (!_sqsBatchDeletionOptions.DrainOnStop)
             {
                 _cancellationTokenSource?.Cancel();
             }
@@ -98,7 +110,8 @@ namespace DotNetCloud.SqsToolbox.Delete
 
             while (i < messages.Count && await _channel.Writer.WaitToWriteAsync(cancellationToken).ConfigureAwait(false))
             {
-                while (i < messages.Count && _channel.Writer.TryWrite(messages[i])) i++;
+                while (i < messages.Count && _channel.Writer.TryWrite(messages[i]))
+                    i++;
             }
         }
 
@@ -108,10 +121,10 @@ namespace DotNetCloud.SqsToolbox.Delete
 
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
+                while (await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false)) // wait until there are messages in the channel before we try to batch
                 {
                     using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                    linkedCts.CancelAfter(_sqsBatchDeleterOptions.MaxWaitForFullBatch);
+                    linkedCts.CancelAfter(_sqsBatchDeletionOptions.MaxWaitForFullBatch);
 
                     await CreateBatchAsync(linkedCts.Token).ConfigureAwait(false);
 
@@ -128,20 +141,22 @@ namespace DotNetCloud.SqsToolbox.Delete
                     if (sqsDeleteBatchResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
                         BatchRequestCompletedDiagnostics(sqsDeleteBatchResponse, sw);
-                        
-                        foreach (var entry in sqsDeleteBatchResponse.Failed)
-                        {
-                            // Failure Handler
-                        }
+
+                        var failureTasks = sqsDeleteBatchResponse.Failed.Select(entry =>
+                            _failedDeletionEntryHandler.OnFailureAsync(entry, cancellationToken)).ToArray();
+
+                        await Task.WhenAll(failureTasks);
+                    }
+                    else
+                    {
+                        // TODO - Handle non-success status code
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Exception Handler
+                _exceptionHandler.OnException(ex);
             }
-
-            Console.WriteLine("Exiting BatchAsync");
         }
 
         private async Task CreateBatchAsync(CancellationToken cancellationToken)
@@ -153,10 +168,11 @@ namespace DotNetCloud.SqsToolbox.Delete
             try
             {
                 while (_currentBatch.Count < 10 && await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
-                {   
+                {
                     var exitBatchCreation = !_channel.Reader.TryRead(out var message) || cancellationToken.IsCancellationRequested;
-                    
-                    if (exitBatchCreation) continue;
+
+                    if (exitBatchCreation)
+                        continue;
 
                     _currentBatch[message.MessageId] = message.ReceiptHandle; // only add each message ID once, using latest receipt handle
                 }
@@ -167,7 +183,7 @@ namespace DotNetCloud.SqsToolbox.Delete
             }
 
             sw.Stop();
-            
+
             BatchCreatedDiagnostics(_currentBatch.Count, sw);
         }
 

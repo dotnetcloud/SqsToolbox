@@ -21,13 +21,13 @@ namespace DotNetCloud.SqsToolbox.Extensions
             return options;
         }
 
-        public static SqsBatchDeleterOptions GetSqsBatchDeleterOptions(this IConfiguration configuration)
+        public static SqsBatchDeletionOptions GetSqsBatchDeleterOptions(this IConfiguration configuration)
         {
             _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
             var section = configuration.GetSection("SQSToolbox");
             
-            var options = new SqsBatchDeleterOptions
+            var options = new SqsBatchDeletionOptions
             {
                 QueueUrl = section.GetValue<string>("QueueUrl", null)
             };

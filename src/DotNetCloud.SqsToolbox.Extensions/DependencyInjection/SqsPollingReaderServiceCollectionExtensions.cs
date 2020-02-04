@@ -100,7 +100,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
             services.TryAddSingleton<IExceptionHandler, DefaultExceptionHandler>();
 
-            services.TryAddSingleton<SqsQueueReaderChannelSource, DefaultSqsQueueReaderChannelSource>();
+            services.TryAddSingleton<SqsMessageChannelSource, DefaultSqsQueueReaderChannelSource>();
         }
     }
 }

@@ -20,11 +20,11 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
             return this;
         }
 
-        public ISqsBatchDeletionBuilder Configure(Action<SqsBatchDeleterOptions> configure)
+        public ISqsBatchDeletionBuilder Configure(Action<SqsBatchDeletionOptions> configure)
         {
             Services.PostConfigure(configure);
 
-            Services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeleterOptions>>()?.Value);
+            Services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeletionOptions>>()?.Value);
 
             return this;
         }

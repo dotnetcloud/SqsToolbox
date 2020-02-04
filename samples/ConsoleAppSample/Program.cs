@@ -74,16 +74,16 @@ namespace ConsoleAppSample
 
             using var pollingReader = new SqsPollingQueueReader(options, client, new SqsPollingDelayer(options), null);
 
-            using var deleter = new SqsBatchDeleter(new SqsBatchDeleterOptions { MaxWaitForFullBatch = TimeSpan.FromSeconds(10), DrainOnStop = true, QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" }, client);
+            //using var deleter = new SqsBatchDeleter(new SqsBatchDeletionOptions { MaxWaitForFullBatch = TimeSpan.FromSeconds(10), DrainOnStop = true, QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" }, client);
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+            //using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
 
-            var readingTask = ReadFromChannelAsync(pollingReader.ChannelReader, deleter, cts.Token);
+            //var readingTask = ReadFromChannelAsync(pollingReader.ChannelReader, deleter, cts.Token);
 
-            deleter.Start(cts.Token);
-            pollingReader.Start(cts.Token);
+            //deleter.Start(cts.Token);
+            //pollingReader.Start(cts.Token);
 
-            await readingTask;
+            //await readingTask;
 
             //for (var i = 0; i < 26; i++)
             //{
@@ -116,7 +116,7 @@ namespace ConsoleAppSample
 
             //await Task.Delay(TimeSpan.FromSeconds(10), cts.Token);
 
-            await deleter.StopAsync();
+            //await deleter.StopAsync();
 
             //await Task.Delay(Timeout.Infinite, cts.Token);
         }

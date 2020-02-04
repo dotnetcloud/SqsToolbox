@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Channels;
 using Amazon.SQS.Model;
+using DotNetCloud.SqsToolbox.Abstractions;
 
 namespace DotNetCloud.SqsToolbox.Receive
 {
-    public class DefaultSqsQueueReaderChannelSource : SqsQueueReaderChannelSource
+    public class DefaultSqsQueueReaderChannelSource : SqsMessageChannelSource
     {
         private readonly int _capacity;
 

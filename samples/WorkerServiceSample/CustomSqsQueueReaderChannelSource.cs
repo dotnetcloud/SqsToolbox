@@ -1,10 +1,10 @@
 using System.Threading.Channels;
 using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox.Receive;
+using DotNetCloud.SqsToolbox.Abstractions;
 
 namespace WorkerServiceSample
 {
-    public class CustomSqsQueueReaderChannelSource : SqsQueueReaderChannelSource
+    public class CustomSqsQueueReaderChannelSource : SqsMessageChannelSource
     {
         private readonly ReceiveQueueChannel _receiveQueueChannel;
 
