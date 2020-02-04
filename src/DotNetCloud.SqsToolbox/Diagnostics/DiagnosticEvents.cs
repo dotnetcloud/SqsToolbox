@@ -21,4 +21,3 @@
         public const string DeleteBatchRequestComplete = "DotNetCloud.SqsToolbox.DeleteBatchRequestComplete";
     }
 }
-`
