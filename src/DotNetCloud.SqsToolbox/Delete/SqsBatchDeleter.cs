@@ -155,7 +155,7 @@ namespace DotNetCloud.SqsToolbox.Delete
             }
             catch (Exception ex)
             {
-                _exceptionHandler.OnException(ex);
+                _exceptionHandler.OnException(ex, this);
             }
         }
 

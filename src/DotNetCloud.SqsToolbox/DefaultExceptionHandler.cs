@@ -3,10 +3,20 @@ using DotNetCloud.SqsToolbox.Abstractions;
 
 namespace DotNetCloud.SqsToolbox
 {
+    /// <summary>
+    /// A default exception handler which no-ops for all exceptions.
+    /// </summary>
     public sealed class DefaultExceptionHandler : IExceptionHandler
     {
+        /// <summary>
+        /// A reusable instance of a shared <see cref="DefaultExceptionHandler"/>.
+        /// </summary>
         public static readonly DefaultExceptionHandler Instance = new DefaultExceptionHandler();
 
-        public void OnException<T>(T exception) where T : Exception { }
+        /// <inheritdoc />
+        public void OnException<T1, T2>(T1 exception, T2 source) where T1 : Exception where T2 : class
+        {
+            // No-op
+        }
     }
 }

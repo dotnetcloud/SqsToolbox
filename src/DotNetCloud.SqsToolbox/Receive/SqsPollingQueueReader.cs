@@ -128,7 +128,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                     {
                         DiagnosticsSqsException(ex, activity);
 
-                        _exceptionHandler.OnException(ex);
+                        _exceptionHandler.OnException(ex, this);
 
                         break;
                     }
@@ -136,7 +136,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                     {
                         DiagnosticsException(ex, activity);
 
-                        _exceptionHandler.OnException(ex);
+                        _exceptionHandler.OnException(ex, this);
 
                         break;
                     }

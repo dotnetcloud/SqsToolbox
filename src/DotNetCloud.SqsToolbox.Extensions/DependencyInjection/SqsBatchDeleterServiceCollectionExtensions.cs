@@ -63,7 +63,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
                 return new SqsBatchDeleterBuilder(sqs, options.Value).Build();
             });
 
-            services.TryAddSingleton<ISqsBatchDeleteQueue, SqsBatchDeleteQueue>();
+            services.TryAddSingleton<ISqsBatchDeleteQueue>(sp => sp.GetRequiredService<ISqsBatchDeleter>());
         }
     }
 }

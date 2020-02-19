@@ -13,29 +13,32 @@ namespace DotNetCloud.SqsToolbox.Extensions
 #else
         private readonly IApplicationLifetime _appLifetime;
 #endif
-        private readonly ILogger<StopApplicationExceptionHandler> _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
 #if NETCOREAPP3_1
-        public StopApplicationExceptionHandler(IHostApplicationLifetime hostApplicationLifetime, ILogger<StopApplicationExceptionHandler> logger)
+        public StopApplicationExceptionHandler(IHostApplicationLifetime hostApplicationLifetime, ILoggerFactory loggerFactory)
         {
             _appLifetime = hostApplicationLifetime ?? throw new ArgumentNullException(nameof(hostApplicationLifetime));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 #else
-         public StopApplicationExceptionHandler(IApplicationLifetime applicationLifetime, ILogger<StopApplicationExceptionHandler> logger)
+        public StopApplicationExceptionHandler(IApplicationLifetime applicationLifetime, ILoggerFactory loggerFactory)
         {
             _appLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 #endif
 
-        public void OnException<T>(T exception) where T : Exception
+        public void OnException<T1, T2>(T1 exception, T2 source) where T1 : Exception where T2 : class
         {
             _ = exception ?? throw new ArgumentNullException(nameof(exception));
+            _ = source ?? throw new ArgumentNullException(nameof(source));
+
+            var logger = _loggerFactory.CreateLogger<T2>();
 
             if (exception is AmazonSQSException)
             {
-                _logger.LogError(exception, "An amazon SQS exception was thrown: {ExceptionMessage}. Stopping application.", exception.Message);
+                logger.LogError(exception, "An amazon SQS exception was thrown: {ExceptionMessage}. Stopping application.", exception.Message);
             }
 
             _appLifetime.StopApplication();
