@@ -35,7 +35,7 @@ namespace DotNetCloud.SqsToolbox.Receive
 
         public TimeSpan InitialDelay { get; set; } = TimeSpan.FromMinutes(1);
 
-        public TimeSpan MaxDelay { get; set; } = TimeSpan.FromMinutes(30);
+        public TimeSpan MaxDelay { get; set; } = TimeSpan.FromMinutes(5);
 
         public TimeSpan DelayWhenOverLimit { get; set; } = TimeSpan.FromMinutes(5);
 

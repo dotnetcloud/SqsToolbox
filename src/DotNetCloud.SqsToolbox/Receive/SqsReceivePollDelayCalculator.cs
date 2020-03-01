@@ -6,16 +6,18 @@ using DotNetCloud.SqsToolbox.Abstractions;
 
 namespace DotNetCloud.SqsToolbox.Receive
 {
-    public class SqsPollingDelayer : ISqsPollingDelayer
+    /// <inheritdoc />
+    public class SqsReceivePollDelayCalculator : ISqsReceivePollDelayCalculator
     {
         private readonly SqsPollingQueueReaderOptions _queueReaderOptions;
         private int _emptyResponseCounter;
 
-        public SqsPollingDelayer(SqsPollingQueueReaderOptions queueReaderOptions)
+        public SqsReceivePollDelayCalculator(SqsPollingQueueReaderOptions queueReaderOptions)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
         }
 
+        /// <inheritdoc />
         public TimeSpan CalculateSecondsToDelay(IEnumerable<Message> messages)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
@@ -36,7 +38,7 @@ namespace DotNetCloud.SqsToolbox.Receive
 
             if (_queueReaderOptions.UseExponentialBackoff)
             {
-                delaySeconds = Math.Max(Math.Pow(delaySeconds, _emptyResponseCounter), _queueReaderOptions.MaxDelay.TotalSeconds);
+                delaySeconds = Math.Min(Math.Pow(delaySeconds, _emptyResponseCounter), _queueReaderOptions.MaxDelay.TotalSeconds);
             }
             
             return TimeSpan.FromSeconds(delaySeconds);

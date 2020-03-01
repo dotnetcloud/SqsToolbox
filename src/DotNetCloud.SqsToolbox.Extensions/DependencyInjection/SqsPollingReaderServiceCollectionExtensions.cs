@@ -96,7 +96,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
         {
             services.TryAddAWSService<IAmazonSQS>();
 
-            services.TryAddSingleton<ISqsPollingDelayer, SqsPollingDelayer>();
+            services.TryAddSingleton<ISqsReceivePollDelayCalculator, SqsReceivePollDelayCalculator>();
             services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
             services.TryAddSingleton<IExceptionHandler, DefaultExceptionHandler>();
 

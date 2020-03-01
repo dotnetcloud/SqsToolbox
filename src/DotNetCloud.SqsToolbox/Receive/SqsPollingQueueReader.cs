@@ -19,7 +19,7 @@ namespace DotNetCloud.SqsToolbox.Receive
 
         private readonly SqsPollingQueueReaderOptions _queueReaderOptions;
         private readonly IAmazonSQS _amazonSqs;
-        private readonly ISqsPollingDelayer _pollingDelayer;
+        private readonly ISqsReceivePollDelayCalculator _pollingDelayer;
         private readonly Channel<Message> _channel;
         private readonly ReceiveMessageRequest _receiveMessageRequest;
         private readonly IExceptionHandler _exceptionHandler;
@@ -32,7 +32,7 @@ namespace DotNetCloud.SqsToolbox.Receive
         private readonly object _startLock = new object();
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsPollingDelayer pollingDelayer, IExceptionHandler exceptionHandler, SqsMessageChannelSource sqsMessageChannelSource = null)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsReceivePollDelayCalculator pollingDelayer, IExceptionHandler exceptionHandler, SqsMessageChannelSource sqsMessageChannelSource = null)
             : this(queueReaderOptions, sqsMessageChannelSource)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
