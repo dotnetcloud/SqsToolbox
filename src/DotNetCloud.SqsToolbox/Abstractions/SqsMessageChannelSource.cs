@@ -4,35 +4,36 @@ using Amazon.SQS.Model;
 namespace DotNetCloud.SqsToolbox.Abstractions
 {
     /// <summary>
-    /// Base class for implementing a source of <see cref="Channel"/>
+    /// Base class for implementing a source of a <see cref="Channel{T}"/> of <see cref="Message"/>.
     /// </summary>
     public abstract class SqsMessageChannelSource
     {
         private static readonly object _lock = new object();
 
-        /// <summary>
-        /// The <see cref="Channel{Message}"/>.
-        /// </summary>
-        public Channel<Message> MessageChannel { get; private set; }
+        private Channel<Message> _messageChannel;
 
-        internal Channel<Message> GetChannel()
+        /// <summary>
+        /// Get an instance of a <see cref="Channel{T}"/> of <see cref="Message"/>.
+        /// </summary>
+        /// <returns>A <see cref="Channel{T}"/> of <see cref="Message"/>.</returns>
+        public Channel<Message> GetChannel()
         {
-            if (MessageChannel is object) return MessageChannel;
+            if (_messageChannel is object) return _messageChannel;
 
             lock (_lock)
             {
-                if (MessageChannel is object) return MessageChannel;
+                if (_messageChannel is object) return _messageChannel;
 
-                MessageChannel = InitialiseChannel();
+                _messageChannel = InitialiseChannel();
             }
 
-            return MessageChannel;
+            return _messageChannel;
         }
 
         /// <summary>
-        /// Initialises a <see cref="Channel{Message}"/>.
+        /// Initialises a <see cref="Channel{T}"/> of <see cref="Message"/>.
         /// </summary>
-        /// <returns>The initialised <see cref="Channel{Message}"/>.</returns>
+        /// <returns>The initialised <see cref="Channel{T}"/>.</returns>
         protected abstract Channel<Message> InitialiseChannel();
     }
 }

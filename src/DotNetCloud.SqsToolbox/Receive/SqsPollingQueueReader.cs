@@ -32,7 +32,7 @@ namespace DotNetCloud.SqsToolbox.Receive
         private readonly object _startLock = new object();
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsReceiveDelayCalculator pollingDelayer, IExceptionHandler exceptionHandler, SqsMessageChannelSource sqsMessageChannelSource = null)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsReceiveDelayCalculator pollingDelayer, IExceptionHandler exceptionHandler, DefaultSqsQueueReaderChannelSource sqsMessageChannelSource = null)
             : this(queueReaderOptions, sqsMessageChannelSource)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
@@ -58,7 +58,7 @@ namespace DotNetCloud.SqsToolbox.Receive
 
         internal SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, SqsMessageChannelSource sqsMessageChannelSource)
         {
-            _channel = sqsMessageChannelSource is object ? sqsMessageChannelSource.GetChannel() : Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
+            _channel = sqsMessageChannelSource?.GetChannel() ?? Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
             {
                 SingleWriter = true
             });

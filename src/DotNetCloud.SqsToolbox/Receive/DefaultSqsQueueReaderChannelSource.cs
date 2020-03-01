@@ -5,6 +5,9 @@ using DotNetCloud.SqsToolbox.Abstractions;
 
 namespace DotNetCloud.SqsToolbox.Receive
 {
+    /// <summary>
+    /// A default source to return a <see cref="Channel{T}"/> of <see cref="Message"/>.
+    /// </summary>
     public class DefaultSqsQueueReaderChannelSource : SqsMessageChannelSource
     {
         private readonly int _capacity;
