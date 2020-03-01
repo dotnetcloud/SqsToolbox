@@ -16,7 +16,7 @@ namespace DotNetCloud.SqsToolbox.Tests
         [InlineData(5, 32)]
         public void ReturnsExpectedDelay_WhenUsingExponentialBackOff(int numberOfEmptyPolls, int expected)
         {
-            var sut = new SqsReceivePollDelayCalculator(new SqsPollingQueueReaderOptions
+            var sut = new SqsReceiveDelayCalculator(new SqsPollingQueueReaderOptions
             {
                 InitialDelay = TimeSpan.FromSeconds(2)
             });
@@ -34,7 +34,7 @@ namespace DotNetCloud.SqsToolbox.Tests
         [Fact]
         public void ReturnsZeroTimeSpan_WhenMoreThanOneMessage()
         {
-            var sut = new SqsReceivePollDelayCalculator(new SqsPollingQueueReaderOptions 
+            var sut = new SqsReceiveDelayCalculator(new SqsPollingQueueReaderOptions 
             { 
                 InitialDelay = TimeSpan.FromSeconds(2) 
             });
@@ -47,7 +47,7 @@ namespace DotNetCloud.SqsToolbox.Tests
         [Fact]
         public void ReturnsMaxValue_WhenSet()
         {
-            var sut = new SqsReceivePollDelayCalculator(new SqsPollingQueueReaderOptions
+            var sut = new SqsReceiveDelayCalculator(new SqsPollingQueueReaderOptions
             {
                 InitialDelay = TimeSpan.FromSeconds(10),
                 MaxDelay = TimeSpan.FromSeconds(5)
@@ -63,7 +63,7 @@ namespace DotNetCloud.SqsToolbox.Tests
         [Fact]
         public void ReturnsInitialDelayForAllCalls_WhenNotUsingExponentialBackOff()
         {
-            var sut = new SqsReceivePollDelayCalculator(new SqsPollingQueueReaderOptions
+            var sut = new SqsReceiveDelayCalculator(new SqsPollingQueueReaderOptions
             {
                 InitialDelay = TimeSpan.FromSeconds(10),
                 UseExponentialBackoff = false

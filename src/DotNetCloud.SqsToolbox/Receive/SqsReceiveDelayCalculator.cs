@@ -7,12 +7,12 @@ using DotNetCloud.SqsToolbox.Abstractions;
 namespace DotNetCloud.SqsToolbox.Receive
 {
     /// <inheritdoc />
-    public class SqsReceivePollDelayCalculator : ISqsReceivePollDelayCalculator
+    public class SqsReceiveDelayCalculator : ISqsReceiveDelayCalculator
     {
         private readonly SqsPollingQueueReaderOptions _queueReaderOptions;
         private int _emptyResponseCounter;
 
-        public SqsReceivePollDelayCalculator(SqsPollingQueueReaderOptions queueReaderOptions)
+        public SqsReceiveDelayCalculator(SqsPollingQueueReaderOptions queueReaderOptions)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
         }

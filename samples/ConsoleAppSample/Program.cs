@@ -72,7 +72,7 @@ namespace ConsoleAppSample
 
             var options = new SqsPollingQueueReaderOptions { QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" };
 
-            using var pollingReader = new SqsPollingQueueReader(options, client, new SqsReceivePollDelayCalculator(options), null);
+            using var pollingReader = new SqsPollingQueueReader(options, client, new SqsReceiveDelayCalculator(options), null);
 
             //using var deleter = new SqsBatchDeleter(new SqsBatchDeletionOptions { MaxWaitForFullBatch = TimeSpan.FromSeconds(10), DrainOnStop = true, QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" }, client);
 

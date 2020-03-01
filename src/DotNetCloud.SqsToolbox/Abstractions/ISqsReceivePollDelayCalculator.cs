@@ -7,7 +7,7 @@ namespace DotNetCloud.SqsToolbox.Abstractions
     /// <summary>
     /// Calculates the next delay for a polling receive message attempt.
     /// </summary>
-    public interface ISqsReceivePollDelayCalculator
+    public interface ISqsReceiveDelayCalculator
     {
         /// <summary>
         /// Calculates a delay between the previous and next polling recieve attempt.
