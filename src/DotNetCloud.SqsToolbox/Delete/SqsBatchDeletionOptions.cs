@@ -7,7 +7,7 @@ namespace DotNetCloud.SqsToolbox.Delete
     /// Provides options used to configure the processing performed by an <see cref="SqsBatchDeleter"/>.
     /// </summary>
     [DebuggerDisplay("QueueUrl = {QueueUrl}")]
-    public class SqsBatchDeletionOptions
+    internal class SqsBatchDeletionOptions
     {
         private string _queueUrl;
         private int _batchSize = 10;

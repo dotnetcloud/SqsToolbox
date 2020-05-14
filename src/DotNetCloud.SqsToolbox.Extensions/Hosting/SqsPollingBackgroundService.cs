@@ -1,30 +1,36 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.Hosting;
 
 namespace DotNetCloud.SqsToolbox.Extensions.Hosting
 {
     public class SqsPollingBackgroundService : IHostedService
     {
-        private readonly ISqsPollingQueueReader _sqsPollingQueueReader;
+        private readonly ISqsPollingQueueReaderFactory _sqsPollingQueueReader;
+        private readonly string _name;
 
-        public SqsPollingBackgroundService(ISqsPollingQueueReader sqsPollingQueueReader)
+        public SqsPollingBackgroundService(ISqsPollingQueueReaderFactory sqsPollingQueueReader, string name)
         {
-            _sqsPollingQueueReader = sqsPollingQueueReader ?? throw new ArgumentNullException(nameof(sqsPollingQueueReader));
+            _sqsPollingQueueReader = sqsPollingQueueReader;
+            _name = name;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _sqsPollingQueueReader.Start(cancellationToken);
+            _sqsPollingQueueReader.GetOrCreateReader(_name).Start(cancellationToken);
 
             return Task.CompletedTask;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _sqsPollingQueueReader.StopAsync();
+            await _sqsPollingQueueReader.GetOrCreateReader(_name).StopAsync();
         }
+    }
+
+    public class SqsPollingBackgroundServiceOptions
+    {
+        public string QueueName { get; set; }
     }
 }

@@ -72,7 +72,7 @@ namespace ConsoleAppSample
 
             var options = new SqsPollingQueueReaderOptions { QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" };
 
-            using var pollingReader = new SqsPollingQueueReader(options, client, new SqsReceiveDelayCalculator(options), null);
+            //using var pollingReader = new SqsPollingQueueReader(options, client, new SqsReceiveDelayCalculator(options), null);
 
             //using var deleter = new SqsBatchDeleter(new SqsBatchDeletionOptions { MaxWaitForFullBatch = TimeSpan.FromSeconds(10), DrainOnStop = true, QueueUrl = "https://sqs.eu-west-1.amazonaws.com/123456789012/test-queue" }, client);
 
@@ -121,14 +121,14 @@ namespace ConsoleAppSample
             //await Task.Delay(Timeout.Infinite, cts.Token);
         }
 
-        private static async Task ReadFromChannelAsync(ChannelReader<Message> reader, SqsBatchDeleter deleter, CancellationToken cancellationToken)
-        {
-            await foreach (var message in reader.ReadAllAsync(cancellationToken))
-            {
-                Console.WriteLine(message.MessageId);
+        //private static async Task ReadFromChannelAsync(ChannelReader<Message> reader, SqsBatchDeleter deleter, CancellationToken cancellationToken)
+        //{
+        //    await foreach (var message in reader.ReadAllAsync(cancellationToken))
+        //    {
+        //        Console.WriteLine(message.MessageId);
 
-                await deleter.AddMessageAsync(message, cancellationToken);
-            }
-        }
+        //        await deleter.AddMessageAsync(message, cancellationToken);
+        //    }
+        //}
     }
 }

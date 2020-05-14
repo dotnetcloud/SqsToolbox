@@ -32,8 +32,7 @@ namespace DotNetCloud.SqsToolbox.Receive
         private readonly object _startLock = new object();
         private static readonly DiagnosticListener _diagnostics = new DiagnosticListener(DiagnosticListenerName);
 
-        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsReceiveDelayCalculator pollingDelayer, IExceptionHandler exceptionHandler, DefaultSqsQueueReaderChannelSource sqsMessageChannelSource = null)
-            : this(queueReaderOptions, sqsMessageChannelSource)
+        public SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, IAmazonSQS amazonSqs, ISqsReceiveDelayCalculator pollingDelayer, IExceptionHandler exceptionHandler, Channel<Message> channel = null)
         {
             _queueReaderOptions = queueReaderOptions ?? throw new ArgumentNullException(nameof(queueReaderOptions));
             _amazonSqs = amazonSqs ?? throw new ArgumentNullException(nameof(amazonSqs));
@@ -54,11 +53,7 @@ namespace DotNetCloud.SqsToolbox.Receive
             }
 
             _exceptionHandler = exceptionHandler ?? DefaultExceptionHandler.Instance;
-        }
-
-        internal SqsPollingQueueReader(SqsPollingQueueReaderOptions queueReaderOptions, SqsMessageChannelSource sqsMessageChannelSource)
-        {
-            _channel = sqsMessageChannelSource?.GetChannel() ?? Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
+            _channel = channel ?? Channel.CreateBounded<Message>(new BoundedChannelOptions(queueReaderOptions.ChannelCapacity)
             {
                 SingleWriter = true
             });
@@ -111,7 +106,7 @@ namespace DotNetCloud.SqsToolbox.Receive
                     try
                     {
                         DiagnosticsStart();
-                        
+
                         response = await _amazonSqs.ReceiveMessageAsync(_receiveMessageRequest, _cancellationTokenSource.Token).ConfigureAwait(false);
 
                         DiagnosticsEnd(response);

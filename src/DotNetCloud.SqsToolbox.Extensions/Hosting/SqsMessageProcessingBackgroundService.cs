@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox.Abstractions;
 using Microsoft.Extensions.Hosting;
 
 namespace DotNetCloud.SqsToolbox.Extensions.Hosting
@@ -13,16 +12,45 @@ namespace DotNetCloud.SqsToolbox.Extensions.Hosting
     /// </summary>
     public abstract class SqsMessageProcessingBackgroundService : BackgroundService
     {
-        private readonly ISqsPollingQueueReader _sqsPollingQueueReader;
+        private readonly IChannelReaderAccessor _channelReaderAccessor;
+        private bool _hasStarted;
 
-        protected SqsMessageProcessingBackgroundService(ISqsPollingQueueReader sqsPollingQueueReader)
+        protected SqsMessageProcessingBackgroundService(IChannelReaderAccessor channelReaderAccessor)
         {
-            _sqsPollingQueueReader = sqsPollingQueueReader ?? throw new ArgumentNullException(nameof(sqsPollingQueueReader));
+            _channelReaderAccessor = channelReaderAccessor ?? throw new ArgumentNullException(nameof(channelReaderAccessor));
         }
 
+        protected string Name { get; private set; }
+
+        /// <summary>
+        /// Sets the logical name of the channel to process.
+        /// </summary>
+        /// <param name="name">The logical name of the channel.</param>
+        internal void SetName(string name)
+        {
+            if (Name is object)
+                throw new InvalidOperationException("Name cannot be set twice.");
+
+            if (_hasStarted)
+                throw new InvalidOperationException("Name cannot be set once the service has been started.");
+
+            Name = name;
+        }
+
+        /// <inheritdoc />
         protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await ProcessFromChannel(_sqsPollingQueueReader.ChannelReader, stoppingToken);
+            if (!string.IsNullOrEmpty(Name))
+            {
+                await ProcessFromChannel(_channelReaderAccessor.GetChannelReader(Name), stoppingToken);
+            }
+        }
+
+        public override Task StartAsync(CancellationToken cancellationToken)
+        {
+            _hasStarted = true;
+
+            return base.StartAsync(cancellationToken);
         }
 
         /// <summary>

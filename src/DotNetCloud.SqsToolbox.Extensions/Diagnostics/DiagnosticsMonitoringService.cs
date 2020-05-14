@@ -45,24 +45,24 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
 
                                 break;
                             }
-                            case DiagnosticEvents.DeletionBatchCreated:
-                            {
-                                if (pair.Value is DeletionBatchCreatedPayload payload)
-                                {
-                                    OnDeleteBatchCreated(payload.MessageCount, payload.MillisecondsTaken);
-                                }
+                            //case DiagnosticEvents.DeletionBatchCreated:
+                            //{
+                            //    if (pair.Value is DeletionBatchCreatedPayload payload)
+                            //    {
+                            //        OnDeleteBatchCreated(payload.MessageCount, payload.MillisecondsTaken);
+                            //    }
 
-                                break;
-                            }
-                            case DiagnosticEvents.DeleteBatchRequestComplete:
-                            {
-                                if (pair.Value is EndDeletionBatchPayload payload)
-                                {
-                                    OnBatchDeleted(payload.DeleteMessageBatchResponse, payload.MillisecondsTaken);
-                                }
+                            //    break;
+                            //}
+                            //case DiagnosticEvents.DeleteBatchRequestComplete:
+                            //{
+                            //    if (pair.Value is EndDeletionBatchPayload payload)
+                            //    {
+                            //        OnBatchDeleted(payload.DeleteMessageBatchResponse, payload.MillisecondsTaken);
+                            //    }
 
-                                break;
-                            }
+                            //    break;
+                            //}
                             case DiagnosticEvents.OverLimitException:
                             {
                                 if (pair.Value is ExceptionPayload payload)
@@ -95,61 +95,61 @@ namespace DotNetCloud.SqsToolbox.Extensions.Diagnostics
                     .Subscribe());
                 }
 
-                if (source.Name == SqsBatchDeleter.DiagnosticListenerName)
-                {
-                    _subscriptions.Add(source.Do(pair =>
-                    {
-                        switch (pair.Key)
-                        {
-                          case DiagnosticEvents.DeletionBatchCreated:
-                                {
-                                    if (pair.Value is DeletionBatchCreatedPayload payload)
-                                    {
-                                        OnDeleteBatchCreated(payload.MessageCount, payload.MillisecondsTaken);
-                                    }
+                //if (source.Name == SqsBatchDeleter.DiagnosticListenerName)
+                //{
+                //    _subscriptions.Add(source.Do(pair =>
+                //    {
+                //        switch (pair.Key)
+                //        {
+                //          case DiagnosticEvents.DeletionBatchCreated:
+                //                {
+                //                    if (pair.Value is DeletionBatchCreatedPayload payload)
+                //                    {
+                //                        OnDeleteBatchCreated(payload.MessageCount, payload.MillisecondsTaken);
+                //                    }
 
-                                    break;
-                                }
-                            case DiagnosticEvents.DeleteBatchRequestComplete:
-                                {
-                                    if (pair.Value is EndDeletionBatchPayload payload)
-                                    {
-                                        OnBatchDeleted(payload.DeleteMessageBatchResponse, payload.MillisecondsTaken);
-                                    }
+                //                    break;
+                //                }
+                //            case DiagnosticEvents.DeleteBatchRequestComplete:
+                //                {
+                //                    if (pair.Value is EndDeletionBatchPayload payload)
+                //                    {
+                //                        OnBatchDeleted(payload.DeleteMessageBatchResponse, payload.MillisecondsTaken);
+                //                    }
 
-                                    break;
-                                }
-                            case DiagnosticEvents.OverLimitException:
-                                {
-                                    if (pair.Value is ExceptionPayload payload)
-                                    {
-                                        OnOverLimit(payload.Exception, payload.Request);
-                                    }
+                //                    break;
+                //                }
+                //            case DiagnosticEvents.OverLimitException:
+                //                {
+                //                    if (pair.Value is ExceptionPayload payload)
+                //                    {
+                //                        OnOverLimit(payload.Exception, payload.Request);
+                //                    }
 
-                                    break;
-                                }
-                            case DiagnosticEvents.AmazonSqsException:
-                                {
-                                    if (pair.Value is ExceptionPayload payload)
-                                    {
-                                        OnSqsException(payload.Exception, payload.Request);
-                                    }
+                //                    break;
+                //                }
+                //            case DiagnosticEvents.AmazonSqsException:
+                //                {
+                //                    if (pair.Value is ExceptionPayload payload)
+                //                    {
+                //                        OnSqsException(payload.Exception, payload.Request);
+                //                    }
 
-                                    break;
-                                }
-                            case DiagnosticEvents.Exception:
-                                {
-                                    if (pair.Value is ExceptionPayload payload)
-                                    {
-                                        OnException(payload.Exception, payload.Request);
-                                    }
+                //                    break;
+                //                }
+                //            case DiagnosticEvents.Exception:
+                //                {
+                //                    if (pair.Value is ExceptionPayload payload)
+                //                    {
+                //                        OnException(payload.Exception, payload.Request);
+                //                    }
 
-                                    break;
-                                }
-                        }
-                    })
-                    .Subscribe());
-                }
+                //                    break;
+                //                }
+                //        }
+                //    })
+                //    .Subscribe());
+                //}
 
             }).Subscribe();
 

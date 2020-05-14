@@ -1,6 +1,6 @@
 ﻿namespace DotNetCloud.SqsToolbox.Diagnostics
 {
-    public sealed class DeletionBatchCreatedPayload
+    internal sealed class DeletionBatchCreatedPayload
     {
         internal DeletionBatchCreatedPayload(int messageCount, long millisecondsTaken)
         {

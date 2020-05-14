@@ -13,7 +13,7 @@ using DotNetCloud.SqsToolbox.Diagnostics;
 
 namespace DotNetCloud.SqsToolbox.Delete
 {
-    public class SqsBatchDeleter : ISqsBatchDeleter, IDisposable
+    internal class SqsBatchDeleter : ISqsBatchDeleter, IDisposable
     {
         public const string DiagnosticListenerName = "DotNetCloud.SqsToolbox.SqsBatchDeleter";
 

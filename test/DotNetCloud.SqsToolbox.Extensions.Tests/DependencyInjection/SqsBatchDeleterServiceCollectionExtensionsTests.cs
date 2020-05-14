@@ -11,36 +11,36 @@ using Xunit;
 
 namespace DotNetCloud.SqsToolbox.Extensions.Tests.DependencyInjection
 {
-    public class SqsBatchDeleterServiceCollectionExtensionsTests
-    {
-        [Fact]
-        public void AddSqsBatchDeletion_WithConfiguration_AddsRequiredServices()
-        {
-            var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new[]
-                {
-                    new KeyValuePair<string, string>("AWS:Region", "eu-west-2"),
-                    new KeyValuePair<string, string>("SQSToolbox:QueueUrl", "https://example.com")
-                })
-                .Build();
+    //public class SqsBatchDeleterServiceCollectionExtensionsTests
+    //{
+    //    [Fact]
+    //    public void AddSqsBatchDeletion_WithConfiguration_AddsRequiredServices()
+    //    {
+    //        var config = new ConfigurationBuilder()
+    //            .AddInMemoryCollection(new[]
+    //            {
+    //                new KeyValuePair<string, string>("AWS:Region", "eu-west-2"),
+    //                new KeyValuePair<string, string>("SQSToolbox:QueueUrl", "https://example.com")
+    //            })
+    //            .Build();
 
-            var services = new ServiceCollection();
+    //        var services = new ServiceCollection();
 
-            services.AddSingleton<IConfiguration>(config);
+    //        services.AddSingleton<IConfiguration>(config);
             
-            services.AddSqsBatchDeletion(config);
+    //        services.AddSqsBatchDeletion(config);
 
-            var sp = services.BuildServiceProvider();
+    //        var sp = services.BuildServiceProvider();
 
-            sp.GetRequiredService<IAmazonSQS>();
+    //        sp.GetRequiredService<IAmazonSQS>();
 
-            sp.GetRequiredService<IOptions<SqsBatchDeletionOptions>>();
-            sp.GetRequiredService<SqsBatchDeletionOptions>();
+    //        sp.GetRequiredService<IOptions<SqsBatchDeletionOptions>>();
+    //        sp.GetRequiredService<SqsBatchDeletionOptions>();
 
-            var deleter = sp.GetRequiredService<ISqsBatchDeleter>();
-            var deleterQueue = sp.GetRequiredService<ISqsBatchDeleteQueue>();
+    //        var deleter = sp.GetRequiredService<ISqsBatchDeleter>();
+    //        var deleterQueue = sp.GetRequiredService<ISqsBatchDeleteQueue>();
 
-            deleter.Should().BeSameAs(deleterQueue);
-        }
-    }
+    //        deleter.Should().BeSameAs(deleterQueue);
+    //    }
+    //}
 }

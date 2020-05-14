@@ -38,7 +38,7 @@ namespace DotNetCloud.SqsToolbox.Extensions
 
             if (exception is AmazonSQSException)
             {
-                logger.LogError(exception, "An amazon SQS exception was thrown: {ExceptionMessage}. Stopping application.", exception.Message);
+                logger.LogError(exception, "Stopping application. An amazon SQS exception was thrown: {ExceptionMessage}", exception.Message);
             }
 
             _appLifetime.StopApplication();

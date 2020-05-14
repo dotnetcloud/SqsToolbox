@@ -2,7 +2,7 @@
 
 namespace DotNetCloud.SqsToolbox.Diagnostics
 {
-    public sealed class EndDeletionBatchPayload
+    internal sealed class EndDeletionBatchPayload
     {
         internal EndDeletionBatchPayload(DeleteMessageBatchResponse response, long millisecondsTaken)
         {

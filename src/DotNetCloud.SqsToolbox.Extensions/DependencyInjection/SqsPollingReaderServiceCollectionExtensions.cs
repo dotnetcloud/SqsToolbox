@@ -1,86 +1,62 @@
 ﻿using System;
 using Amazon.SQS;
 using DotNetCloud.SqsToolbox.Abstractions;
+using DotNetCloud.SqsToolbox.Extensions;
+using DotNetCloud.SqsToolbox.Extensions.DependencyInjection;
 using DotNetCloud.SqsToolbox.Extensions.Diagnostics;
 using DotNetCloud.SqsToolbox.Receive;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
-namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Extension methods for <see cref="ISqsPollingReaderBuilder"/>.
     /// </summary>
     public static class SqsPollingReaderServiceCollectionExtensions
     {
-        /// <summary>
-        /// Add services required for polling from an SQS queue, attempting to parse options from <see cref="IConfiguration"/>.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to add the polling SQS services to.</param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> for the application.</param>
-        /// <returns>An instance of <see cref="ISqsPollingReaderBuilder"/> from which health checks can be registered.</returns>
-        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, IConfiguration configuration)
+        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, IConfigurationSection configurationSection)
         {
-            _ = services ?? throw new ArgumentNullException(nameof(services));
-            _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            
-            AddPollingSqsCore(services);
-
-            var options = configuration.GetPollingQueueReaderOptions();
-            
-            services.Configure<SqsPollingQueueReaderOptions>(opt =>
+            if (services == null)
             {
-                opt.CopyFrom(options);
-            });
+                throw new ArgumentNullException(nameof(services));
+            }
 
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>().Value);
+            if (configurationSection == null)
+            {
+                throw new ArgumentNullException(nameof(configurationSection));
+            }
 
-            return new SqsPollingReaderBuilder(services);
+            var queueName = configurationSection["QueueName"];
+            var queueUrl = configurationSection["QueueUrl"];
+
+            if (string.IsNullOrEmpty(queueName) || string.IsNullOrEmpty(queueUrl))
+                throw new InvalidOperationException("The configuration is invalid.");
+
+            return services.AddPollingSqs(queueName, queueUrl);
         }
 
-        /// <summary>
-        /// Add services required for polling from an SQS queue using the provided <paramref name="queueUrl"/>.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to add the polling SQS services to.</param>
-        /// <param name="queueUrl">The URL of the SQS Queue to poll from.</param>
-        /// <returns></returns>
-        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, string queueUrl)
+        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, string name, string queueUrl)
         {
-            _ = services ?? throw new ArgumentNullException(nameof(services));
-            _ = queueUrl ?? throw new ArgumentNullException(nameof(queueUrl));
-
-            AddPollingSqsCore(services);
-
-            services.Configure<SqsPollingQueueReaderOptions>(opt =>
+            if (services == null)
             {
-                opt.QueueUrl = queueUrl;
-            });
+                throw new ArgumentNullException(nameof(services));
+            }
 
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>().Value);
-
-            return new SqsPollingReaderBuilder(services);
-        }
-
-        /// <summary>
-        /// Add services required for polling from an SQS queue.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to add the polling SQS services to.</param>
-        /// <param name="configure">The <see cref="Action{SqsPollingQueueReaderOptions}"/> to configure the provided <see cref="SqsPollingQueueReaderOptions"/>.</param>
-        /// <returns></returns>
-        public static ISqsPollingReaderBuilder AddPollingSqs(this IServiceCollection services, Action<SqsPollingQueueReaderOptions> configure)
-        {
-            _ = services ?? throw new ArgumentNullException(nameof(services));
-            _ = configure ?? throw new ArgumentNullException(nameof(configure));
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            
+            services.AddOptions();
 
             AddPollingSqsCore(services);
 
-            services.Configure(configure);
+            services.TryAddSingleton<IChannelReaderAccessor, DefaultChannelReaderAccessor>();
 
-            services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsPollingQueueReaderOptions>>().Value);
+            services.Configure<SqsPollingQueueReaderFactoryOptions>(name, options => options.Options.QueueUrl = queueUrl);
 
-            return new SqsPollingReaderBuilder(services);
+            return new DefaultSqsPollingQueueReaderBuilder(services, name);
         }
 
         public static IServiceCollection AddSqsToolboxDiagnosticsMonitoring<T>(this IServiceCollection services) where T : DiagnosticsMonitoringService
@@ -96,11 +72,9 @@ namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
         {
             services.TryAddAWSService<IAmazonSQS>();
 
-            services.TryAddSingleton<ISqsReceiveDelayCalculator, SqsReceiveDelayCalculator>();
-            services.TryAddSingleton<ISqsPollingQueueReader, SqsPollingQueueReader>();
-            services.TryAddSingleton<IExceptionHandler, DefaultExceptionHandler>();
-
-            services.TryAddSingleton<SqsMessageChannelSource, DefaultSqsQueueReaderChannelSource>();
+            services.TryAddSingleton<SqsPollingQueueReaderFactory>();
+            services.TryAddSingleton<ISqsPollingQueueReaderFactory>(serviceProvider => serviceProvider.GetRequiredService<SqsPollingQueueReaderFactory>());
+            services.TryAddSingleton<ISqsMessageChannelFactory>(serviceProvider => serviceProvider.GetRequiredService<SqsPollingQueueReaderFactory>());
         }
     }
 }

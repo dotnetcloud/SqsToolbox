@@ -4,7 +4,7 @@ using Amazon.SQS.Model;
 
 namespace DotNetCloud.SqsToolbox.Abstractions
 {
-    public interface IFailedDeletionEntryHandler
+    internal interface IFailedDeletionEntryHandler
     {
         Task OnFailureAsync(BatchResultErrorEntry batchResultErrorEntry, CancellationToken cancellationToken = default);
     }

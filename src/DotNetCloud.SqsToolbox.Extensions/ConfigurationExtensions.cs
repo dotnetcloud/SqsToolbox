@@ -1,5 +1,4 @@
 ﻿using System;
-using DotNetCloud.SqsToolbox.Delete;
 using DotNetCloud.SqsToolbox.Receive;
 using Microsoft.Extensions.Configuration;
 
@@ -21,18 +20,18 @@ namespace DotNetCloud.SqsToolbox.Extensions
             return options;
         }
 
-        public static SqsBatchDeletionOptions GetSqsBatchDeleterOptions(this IConfiguration configuration)
-        {
-            _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        //public static SqsBatchDeletionOptions GetSqsBatchDeleterOptions(this IConfiguration configuration)
+        //{
+        //    _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            var section = configuration.GetSection("SQSToolbox");
-            
-            var options = new SqsBatchDeletionOptions
-            {
-                QueueUrl = section.GetValue<string>("QueueUrl", null)
-            };
+        //    var section = configuration.GetSection("SQSToolbox");
 
-            return options;
-        }
+        //    var options = new SqsBatchDeletionOptions
+        //    {
+        //        QueueUrl = section.GetValue<string>("QueueUrl", null)
+        //    };
+
+        //    return options;
+        //}
     }
 }

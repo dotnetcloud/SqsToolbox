@@ -7,26 +7,26 @@ using Microsoft.Extensions.Options;
 
 namespace DotNetCloud.SqsToolbox.Extensions.DependencyInjection
 {
-    internal sealed class SqsBatchDeletionBuilder : ISqsBatchDeletionBuilder
-    {
-        public SqsBatchDeletionBuilder(IServiceCollection services) => Services = services;
+    //internal sealed class SqsBatchDeletionBuilder : ISqsBatchDeletionBuilder
+    //{
+    //    public SqsBatchDeletionBuilder(IServiceCollection services) => Services = services;
 
-        public IServiceCollection Services { get; }
+    //    public IServiceCollection Services { get; }
 
-        public ISqsBatchDeletionBuilder WithBackgroundService()
-        {
-            Services.AddHostedService<SqsBatchDeleteBackgroundService>();
+    //    public ISqsBatchDeletionBuilder WithBackgroundService()
+    //    {
+    //        Services.AddHostedService<SqsBatchDeleteBackgroundService>();
 
-            return this;
-        }
+    //        return this;
+    //    }
 
-        public ISqsBatchDeletionBuilder Configure(Action<SqsBatchDeletionOptions> configure)
-        {
-            Services.PostConfigure(configure);
+    //    public ISqsBatchDeletionBuilder Configure(Action<SqsBatchDeletionOptions> configure)
+    //    {
+    //        Services.PostConfigure(configure);
 
-            Services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeletionOptions>>()?.Value);
+    //        Services.TryAddSingleton(sp => sp.GetRequiredService<IOptions<SqsBatchDeletionOptions>>()?.Value);
 
-            return this;
-        }
-    }
+    //        return this;
+    //    }
+    //}
 }
