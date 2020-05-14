@@ -20,9 +20,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.SQS" Version="3.3.102.58" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.7.0" />
-        <PackageReference Include="System.Threading.Channels" Version="4.7.0" />
+        <PackageReference Include="AWSSDK.SQS" Version="3.3.102.109" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.7.1" />
+        <PackageReference Include="System.Threading.Channels" Version="4.7.1" />
     </ItemGroup>
 
 </Project>
