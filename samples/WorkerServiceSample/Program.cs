@@ -19,6 +19,5 @@ namespace WorkerServiceSample
                     
                     services.AddSqsToolboxDiagnosticsMonitoring<DiagnosticsMonitorService>();
                 });
-
     }
 }
