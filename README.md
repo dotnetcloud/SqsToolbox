@@ -22,6 +22,10 @@ This is a work-in-progress repository for a set of libraries, extensions and hel
 
 Supporting types for polling an SQS queue repeatedly for messages in a background `Task`.
 
+### Design Goals
+
+Support minimal boilerplate code required for the common scenario in a queue processing worker service. Most of the code is provided by the library, with extension points for customisation of the default behaviours. When used in a `Host` based worker service or ASP.NET Core app, service registrations support registration of readers for multiple, logically named queues.
+
 ### Quick Start
 
 **WARNING**
@@ -86,6 +90,16 @@ Back to the builder, `WithDefaultExceptionHandler()` registered a simple excepti
 
 For more usage ideas, see the sample project.
 
+#### Future
+
+Not yet in the alpha package, but available in the source is a simplified extension method for register the reader in common cases.
+
+```csharp
+services.AddDefaultPollingSqs<QueueProcessor>(hostContext.Configuration.GetSection("TestQueue"));
+```
+
+This is similar to the earlier example and will register the reader background sevrice + the QueueProcessor service, along with default exception handling. Configure is not called in this example, but can be.
+
 # Diagnostics
 
 I've started plumbing in some `DiagnosticListener` logging for activty tracing. This is available but not documented yet.
@@ -96,7 +110,9 @@ I've started plumbing in some `DiagnosticListener` logging for activty tracing. 
 
 Support for registering messages for deletion in batches, with an optional timer that triggers the batch if the batch size has not been met.
 
-Status: Work in progress
+Status: Work in progress.
+
+This is made internal currently as there will be API breaking changes to support running multiple batch deleters against multiple queues. Current code assumed a single queue use case which is a bit restrictive. This work will be available in a future alpha release.
 
 # Support
 
