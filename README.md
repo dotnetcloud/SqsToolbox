@@ -98,6 +98,10 @@ Support for registering messages for deletion in batches, with an optional timer
 
 Status: Work in progress
 
-# Feedback
+# Support
+
+If this library has helped you, feel free to [buy me a coffee](https://www.buymeacoffee.com/stevejgordon) or see the "Sponsor" link [at the top of the GitHub page](https://github.com/stevejgordon/CorrelationId).
+
+## Feedback
 
 I welcome ideas for features and improvements to be raised as issues which I will respond to as soon as I can. This is a hobby project so it may not be immediate!
