@@ -44,7 +44,7 @@ services.AddPollingSqs(hostContext.Configuration.GetSection("TestQueue"))
     .WithDefaultExceptionHandler();
 ```
 
-Various builder extension methods exist to constomise the queue reader and message consumption. These are optional and provide convience use for common scenarios.
+Various builder extension methods exist to customise the queue reader and message consumption. These are optional and provide convenience use for common scenarios.
 
 The above code registers the polling queue reader, loading it's logical name and URL from an `IConfigurationSection`.
 
@@ -52,7 +52,7 @@ Additional configuration can be provided by calling the `Configure` method on th
 
 `WithBackgroundService` registers an `IHostedService` which will start and stop the queue reader for the `IHost`.
 
-`WithMessageProcessor` allows you to register an special kind of `IHostedService` which consumes messages from the channel. You must derive from the abstract `SqsMessageProcessingBackgroundService` class to provide the basic message handling functionality you require. 
+`WithMessageProcessor` allows you to register a special kind of `IHostedService` which consumes messages from the channel. You must derive from the abstract `SqsMessageProcessingBackgroundService` class to provide the basic message handling functionality you require. 
 
 An abstract class `MessageProcessorService`, which inherits from `SqsMessageProcessingBackgroundService`, may also be used to simplify the code you need to implement. When deriving from this class, you implement the `ProcessMessage` to handle each message.
 
