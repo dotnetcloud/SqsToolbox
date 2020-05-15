@@ -88,7 +88,7 @@ namespace DotNetCloud.SqsToolbox.Receive
 
             _cancellationTokenSource?.Cancel();
 
-            await _pollingTask;
+            await _pollingTask.ConfigureAwait(false);
         }
 
         private async Task PollForMessagesAsync()

@@ -1,5 +1,4 @@
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using DotNetCloud.SqsToolbox.Extensions;
@@ -8,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace WorkerServiceSample
 {
-    public class QueueProcessor : SqsMessageProcessingBackgroundService
+    public class QueueProcessor : MessageProcessorService
     {
         private readonly ILogger<QueueProcessor> _logger;
 
@@ -16,20 +15,19 @@ namespace WorkerServiceSample
         {
             _logger = logger;
         }
-        
-        public override async Task ProcessFromChannel(ChannelReader<Message> channelReader, CancellationToken cancellationToken)
+
+        public override Task ProcessMessage(Message message, CancellationToken cancellationToken = default)
         {
-            await foreach (var message in channelReader.ReadAllAsync(cancellationToken))
+            _logger.LogInformation(message.Body);
+
+            foreach (var (key, value) in message.Attributes)
             {
-                _logger.LogInformation(message.Body);
-
-                foreach (var (key, value) in message.Attributes)
-                {
-                    _logger.LogInformation($"{key} = {value}");
-                }
-
-                //await _sqsBatchDeleteQueue.AddMessageAsync(message, cancellationToken);
+                _logger.LogInformation($"{key} = {value}");
             }
+
+            // more processing / deletion etc.
+
+            return Task.CompletedTask;
         }
     }
 }

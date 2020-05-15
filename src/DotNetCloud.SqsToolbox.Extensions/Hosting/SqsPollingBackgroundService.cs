@@ -25,12 +25,7 @@ namespace DotNetCloud.SqsToolbox.Extensions.Hosting
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _sqsPollingQueueReader.GetOrCreateReader(_name).StopAsync();
+            await _sqsPollingQueueReader.GetOrCreateReader(_name).StopAsync().ConfigureAwait(false);
         }
-    }
-
-    public class SqsPollingBackgroundServiceOptions
-    {
-        public string QueueName { get; set; }
     }
 }

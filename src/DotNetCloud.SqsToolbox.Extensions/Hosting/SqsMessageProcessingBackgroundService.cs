@@ -40,14 +40,13 @@ namespace DotNetCloud.SqsToolbox.Extensions.Hosting
         /// <inheritdoc />
         protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            if (!string.IsNullOrEmpty(Name))
-            {
-                await ProcessFromChannel(_channelReaderAccessor.GetChannelReader(Name), stoppingToken);
-            }
+            await ProcessFromChannel(_channelReaderAccessor.GetChannelReader(Name), stoppingToken);
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(Name)) return Task.CompletedTask;
+
             _hasStarted = true;
 
             return base.StartAsync(cancellationToken);
@@ -58,9 +57,9 @@ namespace DotNetCloud.SqsToolbox.Extensions.Hosting
         /// starts. The implementation should return a task that represents a long running task
         /// which reads messages from a <see cref="ChannelReader{T}"/> of <see cref="Message"/>.
         /// </summary>
-        /// <param name="channelReader">The <see cref="ChannelReader{T}"/> of <see cref="Message"/> fromw which to receive messages.</param>
+        /// <param name="channelReader">The <see cref="ChannelReader{T}"/> of <see cref="Message"/> from which to receive messages.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> triggered when the host is shutting down.</param>
         /// <returns>A <see cref="Task"/> that represents the long running channel reading.</returns>
-        public abstract Task ProcessFromChannel(ChannelReader<Message> channelReader, CancellationToken cancellationToken);
+        public abstract Task ProcessFromChannel(ChannelReader<Message> channelReader, CancellationToken cancellationToken = default);
     }
 }
