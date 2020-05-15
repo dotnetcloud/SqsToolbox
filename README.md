@@ -6,16 +6,11 @@ This is a work-in-progress repository for a set of libraries, extensions and hel
   <img src="sqs-toolbox.png" width="300">
 </p>
 
-## Base Package
+## Packages
 
 | Package | NuGet Stable | NuGet Pre-release | Downloads | 
 | ------- | ------------ | ----------------- | --------- | 
 | [DotNetCloud.SqsToolbox](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | [![NuGet](https://img.shields.io/nuget/v/DotNetCloud.SqsToolbox.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | [![NuGet](https://img.shields.io/nuget/vpre/DotNetCloud.SqsToolbox.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | [![Nuget](https://img.shields.io/nuget/dt/DotNetCloud.SqsToolbox.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | 
-
-## Extensions
-
-| Package | NuGet Stable | NuGet Pre-release | Downloads | 
-| ------- | ------------ | ----------------- | --------- | 
 | [DotNetCloud.SqsToolbox.Extensions](https://www.nuget.org/packages/DotNetCloud.SqsToolbox.Extensions) | [![NuGet](https://img.shields.io/nuget/v/DotNetCloud.SqsToolbox.Extensions.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox.Extensions) | [![NuGet](https://img.shields.io/nuget/vpre/DotNetCloud.SqsToolbox.Extensions.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox.Extensions) | [![Nuget](https://img.shields.io/nuget/dt/DotNetCloud.SqsToolbox.Extensions.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox.Extensions) | 
 
 # Features
