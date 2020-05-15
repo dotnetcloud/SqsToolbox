@@ -97,7 +97,7 @@ Not yet in the alpha package, but available in the source is a simplified extens
 services.AddDefaultPollingSqs<QueueProcessor>(hostContext.Configuration.GetSection("TestQueue"));
 ```
 
-This is similar to the earlier example and will register the reader background sevrice + the QueueProcessor service, along with default exception handling. Configure is not called in this example, but can be.
+This is similar to the earlier example and will register the reader background service + the QueueProcessor service, along with default exception handling. Configure is not called in this example, but can be.
 
 # Diagnostics
 
