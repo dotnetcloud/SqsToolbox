@@ -13,7 +13,6 @@
         <PackageId>DotNetCloud.SqsToolbox</PackageId>
         <PackageTags>sqs;aws;toolbox;tools</PackageTags>
         <PackageProjectUrl>https://github.com/dotnetcloud/SqsToolbox</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/dotnetcloud/SqsToolbox/blob/master/LICENSE</PackageLicenseUrl>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryType>git</RepositoryType>
