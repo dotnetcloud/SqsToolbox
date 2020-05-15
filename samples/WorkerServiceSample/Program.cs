@@ -18,7 +18,7 @@ namespace WorkerServiceSample
                         .WithDefaultExceptionHandler();
 
                     // the above can be simplified to:
-                    services.AddDefaultPollingSqs<QueueProcessor>(hostContext.Configuration.GetSection("TestQueue")); // This snippet does not call configure, but can do if required.
+                    services.AddDefaultPollingSqs<QueueProcessor>(hostContext.Configuration.GetSection("TestQueue2")); // This snippet does not call configure, but can do if required.
 
                     services.AddSqsToolboxDiagnosticsMonitoring<DiagnosticsMonitorService>();
                 });
