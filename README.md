@@ -51,7 +51,7 @@ Additional configuration can be provided by calling the `Configure` method on th
 
 `WithMessageProcessor` allows you to register an special kind of `IHostedService` which consumes messages from the channel. You must derive from the abstract `SqsMessageProcessingBackgroundService` class to provide the basic message handling functionality you require. 
 
-An sbtract class `MessageProcessorService` may also be used to simplify the code you need to implement. When deriving from this class, you implement the `ProcessMessage` to handle each message.
+An abstract class `MessageProcessorService`, which inherits from `SqsMessageProcessingBackgroundService`, may also be used to simplify the code you need to implement. When deriving from this class, you implement the `ProcessMessage` to handle each message.
 
 For example:
 
