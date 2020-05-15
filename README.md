@@ -2,6 +2,10 @@
 
 This is a work-in-progress repository for a set of libraries, extensions and helpers to support working with AWS Simple Queue Service from .NET applications.
 
+<p align="center">
+  <img src="sqs-toolbox.png" width="300">
+</p>
+
 ## Base Package
 
 | Package | NuGet Stable | NuGet Pre-release | Downloads | 
