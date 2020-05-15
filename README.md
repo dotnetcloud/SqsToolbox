@@ -70,7 +70,7 @@ public class QueueProcessor : MessageProcessorService
         _logger = logger;
     }
 
-    public override Task ProcessMessage(Message message, CancellationToken cancellationToken = default)
+    public override Task ProcessMessageAsync(Message message, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(message.Body);
 
