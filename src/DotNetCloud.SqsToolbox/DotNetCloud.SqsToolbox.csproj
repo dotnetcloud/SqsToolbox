@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>A collection of tools, extensions and helpers for working with AWS Simple Queue Service (SQS) from .NET applications.</Description>
+        <Description>.NET Core extensions to support DI registration.</Description>
         <Copyright>Copyright © 2020, Steve Gordon</Copyright>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFrameworks>netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
         <Version>1.0.0-alpha.5</Version>
         <VersionSuffix>1.0.0.$([System.DateTime]::UtcNow.ToString(mmff))</VersionSuffix>
         <AssemblyVersion Condition=" '$(VersionSuffix)' == '' ">0.0.0.1</AssemblyVersion>
@@ -11,7 +11,7 @@
         <InformationalVersion>1.0.0 Alpha 5</InformationalVersion>
         <PackageVersion>1.0.0-alpha.5</PackageVersion>
         <PackageId>DotNetCloud.SqsToolbox</PackageId>
-        <PackageTags>sqs;aws;toolbox;tools</PackageTags>
+        <PackageTags>sqs;aws;toolbox;tools;extensions;netcore</PackageTags>
         <PackageProjectUrl>https://github.com/dotnetcloud/SqsToolbox</PackageProjectUrl>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -22,9 +22,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.SQS" Version="3.3.102.109" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.7.1" />
-        <PackageReference Include="System.Threading.Channels" Version="4.7.1" />
+        <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.101" />
+        <PackageReference Include="System.Reactive.Linq" Version="4.4.1" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp3.1' ">
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.1.*" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.*" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.*" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.*" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.*" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.*" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.*" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.*" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DotNetCloud.SqsToolbox.Core\DotNetCloud.SqsToolbox.Core.csproj" />
     </ItemGroup>
 
 </Project>

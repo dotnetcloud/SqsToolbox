@@ -1,5 +1,5 @@
 using System;
-using DotNetCloud.SqsToolbox.Abstractions;
+using DotNetCloud.SqsToolbox.Core.Abstractions;
 
 namespace WorkerServiceSample
 {

@@ -1,5 +1,5 @@
 using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox.Extensions.Diagnostics;
+using DotNetCloud.SqsToolbox.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 namespace WorkerServiceSample

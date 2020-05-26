@@ -9,6 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DotNetCloud.SqsToolbox.Extensions\DotNetCloud.SqsToolbox.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\DotNetCloud.SqsToolbox\DotNetCloud.SqsToolbox.csproj" />
   </ItemGroup>
 </Project>

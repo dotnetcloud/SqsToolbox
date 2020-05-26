@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.Runtime.CredentialManagement;
 using Amazon.SQS;
-using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox.Delete;
-using DotNetCloud.SqsToolbox.Receive;
+using DotNetCloud.SqsToolbox.Core.Receive;
 
 namespace ConsoleAppSample
 {

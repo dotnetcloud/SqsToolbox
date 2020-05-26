@@ -1,8 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
-using DotNetCloud.SqsToolbox.Extensions;
-using DotNetCloud.SqsToolbox.Extensions.Hosting;
+using DotNetCloud.SqsToolbox;
+using DotNetCloud.SqsToolbox.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace WorkerServiceSample
