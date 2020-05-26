@@ -8,7 +8,7 @@ This is a work-in-progress repository for a set of libraries, extensions and hel
 
 ## Packages
 
-* IN PREVIEW 6 THE NAMESPACES AND PACKAGE NAMES WILL CHANGE *
+**IN PREVIEW 6 THE NAMESPACES AND PACKAGE NAMES WILL CHANGE**
 
 | Package | NuGet Stable | NuGet Pre-release | Downloads | 
 | ------- | ------------ | ----------------- | --------- | 
@@ -34,7 +34,7 @@ These packages are considered alpha quality. They are not fully tested and the p
 
 The most convenient consumption pattern is to utilise the DotNetCloud.SqsToolbox.Extensions package which provides extensions to integration with the Microsoft dependency injection and configuration libraries.
 
-* IN PREVIEW 6 THE NAMESPACES AND PACKAGE NAMES WILL CHANGE *
+**IN PREVIEW 6 THE NAMESPACES AND PACKAGE NAMES WILL CHANGE**
 
 Add the latest alpha NuGet package from [nuget.org](https://www.nuget.org/packages/DotNetCloud.SqsToolbox.Extensions).
 
