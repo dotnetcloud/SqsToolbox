@@ -8,6 +8,8 @@ This is a work-in-progress repository for a set of libraries, extensions and hel
 
 ## Packages
 
+* IN PREVIEW 6 THE NAMESPACES AND PACKAGE NAMES WILL CHANGE *
+
 | Package | NuGet Stable | NuGet Pre-release | Downloads | 
 | ------- | ------------ | ----------------- | --------- | 
 | [DotNetCloud.SqsToolbox](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | [![NuGet](https://img.shields.io/nuget/v/DotNetCloud.SqsToolbox.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | [![NuGet](https://img.shields.io/nuget/vpre/DotNetCloud.SqsToolbox.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | [![Nuget](https://img.shields.io/nuget/dt/DotNetCloud.SqsToolbox.svg)](https://www.nuget.org/packages/DotNetCloud.SqsToolbox) | 
@@ -31,6 +33,8 @@ Support minimal boilerplate code required for the common scenario in a queue pro
 These packages are considered alpha quality. They are not fully tested and the public API is likely to change during development and based on feedback. I encourage you to try the packages to provide your thoughts and requirements, but perhaps be wary of using this in production!
 
 The most convenient consumption pattern is to utilise the DotNetCloud.SqsToolbox.Extensions package which provides extensions to integration with the Microsoft dependency injection and configuration libraries.
+
+* IN PREVIEW 6 THE NAMESPACES AND PACKAGE NAMES WILL CHANGE *
 
 Add the latest alpha NuGet package from [nuget.org](https://www.nuget.org/packages/DotNetCloud.SqsToolbox.Extensions).
 
