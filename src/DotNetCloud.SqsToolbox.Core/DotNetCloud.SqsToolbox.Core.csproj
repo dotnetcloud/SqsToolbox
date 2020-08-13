@@ -27,4 +27,10 @@
         <PackageReference Include="System.Threading.Channels" Version="4.7.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>DotNetCloud.SqsToolbox.Core.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
 </Project>
